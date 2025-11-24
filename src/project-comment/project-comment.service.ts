@@ -1,53 +1,50 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Feature } from './entities/feature.entity';
-import { CreateFeatureDto } from './dto/create-feature.dto';
-import { UpdateFeatureDto } from './dto/update-feature.dto';
-import { Monitor } from '../monitor/entities/monitor.entity';
+import { ProjectComment } from './entities/project-comment.entity';
+import { CreateProjectCommentDto } from './dto/create-project-comment.dto';
+import { UpdateProjectCommentDto } from './dto/update-project-comment.dto';
 
 @Injectable()
-export class FeaturesService {
-  private features: Feature[] = [];
+export class ProjectCommentService {
+  private projectComments: ProjectComment[] = [];
   private idCounter = 1;
 
-  async create(createFeatureDto: CreateFeatureDto): Promise<Feature> {
-    const feature: Feature = {
+  async create(createProjectCommentDto: CreateProjectCommentDto): Promise<ProjectComment> {
+    const projectComment: ProjectComment = {
       id: this.idCounter++,
-      ...createFeatureDto,
-      monitor: { id: createFeatureDto.monitorId } as any,
+      ...createProjectCommentDto,
+      monitor: { id: createProjectCommentDto.monitorId } as any,
     };
-    this.features.push(feature);
-    return feature;
+    this.projectComments.push(projectComment);
+    return projectComment;
   }
 
-  async findAll(): Promise<Feature[]> {
-    return this.features;
+  async findAll(): Promise<ProjectComment[]> {
+    return this.projectComments;
   }
 
-  async findOne(id: number): Promise<Feature> {
-    const feature = this.features.find(f => f.id === id);
-    if (!feature) {
-      throw new NotFoundException(`Feature with ID ${id} not found`);
+  async findOne(id: number): Promise<ProjectComment> {
+    const projectComment = this.projectComments.find(f => f.id === id);
+    if (!projectComment) {
+      throw new NotFoundException(`ProjectComment with ID ${id} not found`);
     }
-    return feature;
+    return projectComment;
   }
 
-  async update(id: number, updateFeatureDto: UpdateFeatureDto): Promise<Feature> {
-    const feature = await this.findOne(id);
-    Object.assign(feature, updateFeatureDto);
-    return feature;
+  async update(id: number, updateProjectCommentDto: UpdateProjectCommentDto): Promise<ProjectComment> {
+    const projectComment = await this.findOne(id);
+    Object.assign(projectComment, updateProjectCommentDto);
+    return projectComment;
   }
 
   async remove(id: number): Promise<void> {
-    const index = this.features.findIndex(f => f.id === id);
+    const index = this.projectComments.findIndex(f => f.id === id);
     if (index === -1) {
-      throw new NotFoundException(`Feature with ID ${id} not found`);
+      throw new NotFoundException(`ProjectComment with ID ${id} not found`);
     }
-    this.features.splice(index, 1);
+    this.projectComments.splice(index, 1);
   }
 
-  async findByMonitorId(monitorId: number): Promise<Feature[]> {
-    return this.features.filter(f => f.monitorId === monitorId);
-  }
+
 }

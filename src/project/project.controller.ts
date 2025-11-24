@@ -1,63 +1,63 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { FeaturesService } from './feature.service';
-import { CreateFeatureDto } from './dto/create-feature.dto';
-import { UpdateFeatureDto } from './dto/update-feature.dto';
-import { Feature } from './entities/feature.entity';
+import { ProjectService } from './project.service';
+import { CreateProjectDto } from './dto/create-project.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
+import { Project } from './entities/project.entity';
 
-@ApiTags('features')
-@Controller('features')
-export class FeaturesController {
-  constructor(private readonly featuresService: FeaturesService) {}
+@ApiTags('projects')
+@Controller('projects')
+export class ProjectsController {
+  constructor(private readonly projectsService: ProjectsService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new feature' })
-  @ApiResponse({ status: 201, description: 'Feature created successfully', type: Feature })
-  create(@Body() createFeatureDto: CreateFeatureDto): Promise<Feature> {
-    return this.featuresService.create(createFeatureDto);
+  @ApiOperation({ summary: 'Create a new project' })
+  @ApiResponse({ status: 201, description: 'Project created successfully', type: Project })
+  create(@Body() createProjectDto: CreateProjectDto): Promise<Project> {
+    return this.projectsService.create(createProjectDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all features with their monitors' })
-  @ApiResponse({ status: 200, description: 'List of all features', type: [Feature] })
-  findAll(): Promise<Feature[]> {
-    return this.featuresService.findAll();
+  @ApiOperation({ summary: 'Get all projects with their monitors' })
+  @ApiResponse({ status: 200, description: 'List of all projects', type: [Project] })
+  findAll(): Promise<Project[]> {
+    return this.projectsService.findAll();
   }
 
   @Get('monitor/:monitorId')
-  @ApiOperation({ summary: 'Get features by monitor ID' })
+  @ApiOperation({ summary: 'Get projects by monitor ID' })
   @ApiParam({ name: 'monitorId', type: 'number', description: 'Monitor ID' })
-  @ApiResponse({ status: 200, description: 'List of features for the monitor', type: [Feature] })
-  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<Feature[]> {
-    return this.featuresService.findByMonitorId(monitorId);
+  @ApiResponse({ status: 200, description: 'List of projects for the monitor', type: [Project] })
+  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<Project[]> {
+    return this.projectsService.findByMonitorId(monitorId);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get feature by ID' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature found', type: Feature })
-  @ApiResponse({ status: 404, description: 'Feature not found' })
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Feature> {
-    return this.featuresService.findOne(id);
+  @ApiOperation({ summary: 'Get project by ID' })
+  @ApiParam({ name: 'id', type: 'number', description: 'Project ID' })
+  @ApiResponse({ status: 200, description: 'Project found', type: Project })
+  @ApiResponse({ status: 404, description: 'Project not found' })
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<Project> {
+    return this.projectsService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update feature' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature updated', type: Feature })
+  @ApiOperation({ summary: 'Update project' })
+  @ApiParam({ name: 'id', type: 'number', description: 'Project ID' })
+  @ApiResponse({ status: 200, description: 'Project updated', type: Project })
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateFeatureDto: UpdateFeatureDto,
-  ): Promise<Feature> {
-    return this.featuresService.update(id, updateFeatureDto);
+    @Body() updateProjectDto: UpdateProjectDto,
+  ): Promise<Project> {
+    return this.projectsService.update(id, updateProjectDto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete feature' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature deleted' })
-  @ApiResponse({ status: 404, description: 'Feature not found' })
+  @ApiOperation({ summary: 'Delete project' })
+  @ApiParam({ name: 'id', type: 'number', description: 'Project ID' })
+  @ApiResponse({ status: 200, description: 'Project deleted' })
+  @ApiResponse({ status: 404, description: 'Project not found' })
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.featuresService.remove(id);
+    return this.projectsService.remove(id);
   }
 }

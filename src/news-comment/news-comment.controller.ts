@@ -1,63 +1,63 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { FeaturesService } from './feature.service';
-import { CreateFeatureDto } from './dto/create-feature.dto';
-import { UpdateFeatureDto } from './dto/update-feature.dto';
-import { Feature } from './entities/feature.entity';
+import { NewsCommentService } from './news-comment.service';
+import { CreateNewsCommentDto } from './dto/create-news-comment.dto';
+import { UpdateNewsCommentDto } from './dto/update-news-comment.dto';
+import { NewsComment } from './entities/news-comment.entity';
 
-@ApiTags('features')
-@Controller('features')
-export class FeaturesController {
-  constructor(private readonly featuresService: FeaturesService) {}
+@ApiTags('news-comments')
+@Controller('news-comments')
+export class NewsCommentController {
+  constructor(private readonly newsCommentService: NewsCommentService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new feature' })
-  @ApiResponse({ status: 201, description: 'Feature created successfully', type: Feature })
-  create(@Body() createFeatureDto: CreateFeatureDto): Promise<Feature> {
-    return this.featuresService.create(createFeatureDto);
+  @ApiOperation({ summary: 'Create a new news comment' })
+  @ApiResponse({ status: 201, description: 'News comment created successfully', type: NewsComment })
+  create(@Body() createNewsCommentDto: CreateNewsCommentDto): Promise<NewsComment> {
+    return this.newsCommentService.create(createNewsCommentDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all features with their monitors' })
-  @ApiResponse({ status: 200, description: 'List of all features', type: [Feature] })
-  findAll(): Promise<Feature[]> {
-    return this.featuresService.findAll();
+  @ApiOperation({ summary: 'Get all news comments with their monitors' })
+  @ApiResponse({ status: 200, description: 'List of all news comments', type: [NewsComment] })
+  findAll(): Promise<NewsComment[]> {
+    return this.newsCommentService.findAll();
   }
 
   @Get('monitor/:monitorId')
-  @ApiOperation({ summary: 'Get features by monitor ID' })
+  @ApiOperation({ summary: 'Get news comments by monitor ID' })
   @ApiParam({ name: 'monitorId', type: 'number', description: 'Monitor ID' })
-  @ApiResponse({ status: 200, description: 'List of features for the monitor', type: [Feature] })
-  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<Feature[]> {
-    return this.featuresService.findByMonitorId(monitorId);
+  @ApiResponse({ status: 200, description: 'List of news comments for the monitor', type: [NewsComment] })
+  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<NewsComment[]> {
+    return this.newsCommentService.findByMonitorId(monitorId);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get feature by ID' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature found', type: Feature })
-  @ApiResponse({ status: 404, description: 'Feature not found' })
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Feature> {
-    return this.featuresService.findOne(id);
+  @ApiOperation({ summary: 'Get news comment by ID' })
+  @ApiParam({ name: 'id', type: 'number', description: 'News comment ID' })
+  @ApiResponse({ status: 200, description: 'News comment found', type: NewsComment })
+  @ApiResponse({ status: 404, description: 'News comment not found' })
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<NewsComment> {
+    return this.newsCommentService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update feature' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature updated', type: Feature })
+  @ApiOperation({ summary: 'Update news comment' })
+  @ApiParam({ name: 'id', type: 'number', description: 'News comment ID' })
+  @ApiResponse({ status: 200, description: 'News comment updated', type: NewsComment })
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateFeatureDto: UpdateFeatureDto,
-  ): Promise<Feature> {
-    return this.featuresService.update(id, updateFeatureDto);
+    @Body() updateNewsCommentDto: UpdateNewsCommentDto,
+  ): Promise<NewsComment> {
+    return this.newsCommentService.update(id, updateNewsCommentDto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete feature' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature deleted' })
-  @ApiResponse({ status: 404, description: 'Feature not found' })
+  @ApiOperation({ summary: 'Delete news comment' })
+  @ApiParam({ name: 'id', type: 'number', description: 'News comment ID' })
+  @ApiResponse({ status: 200, description: 'News comment deleted' })
+  @ApiResponse({ status: 404, description: 'News comment not found' })
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.featuresService.remove(id);
+    return this.newsCommentService.remove(id);
   }
 }

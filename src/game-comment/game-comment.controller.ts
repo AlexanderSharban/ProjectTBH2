@@ -1,63 +1,65 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { FeaturesService } from './feature.service';
-import { CreateFeatureDto } from './dto/create-feature.dto';
-import { UpdateFeatureDto } from './dto/update-feature.dto';
-import { Feature } from './entities/feature.entity';
+import { GameComment } from './game-comment.service';
+import { CreateGameCommentDto } from './dto/create-game-comment.dto';
+import { UpdateGameCommentDto } from './dto/update-game-comment.dto';
+import { GameComment } from './entities/game-comment.entity';
+import { CreateGameCommentDto } from './dto/create-game-comment.dto';
+import { UpdateGameCommentDto } from './dto/update-game-comment.dto';
 
-@ApiTags('features')
-@Controller('features')
-export class FeaturesController {
-  constructor(private readonly featuresService: FeaturesService) {}
+@ApiTags('game-comments')
+@Controller('game-comments')
+export class GameCommentController {
+  constructor(private readonly gameCommentService: GameCommentService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new feature' })
-  @ApiResponse({ status: 201, description: 'Feature created successfully', type: Feature })
-  create(@Body() createFeatureDto: CreateFeatureDto): Promise<Feature> {
-    return this.featuresService.create(createFeatureDto);
+  @ApiOperation({ summary: 'Create a new game comment' })
+  @ApiResponse({ status: 201, description: 'Game comment created successfully', type: GameComment })
+  create(@Body() createGameCommentDto: CreateGameCommentDto): Promise<GameComment> {
+    return this.gameCommentService.create(createGameCommentDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all features with their monitors' })
-  @ApiResponse({ status: 200, description: 'List of all features', type: [Feature] })
-  findAll(): Promise<Feature[]> {
-    return this.featuresService.findAll();
+  @ApiOperation({ summary: 'Get all game comments with their monitors' })
+  @ApiResponse({ status: 200, description: 'List of all game comments', type: [GameComment] })
+  findAll(): Promise<GameComment[]> {
+    return this.gameCommentService.findAll();
   }
 
   @Get('monitor/:monitorId')
-  @ApiOperation({ summary: 'Get features by monitor ID' })
+  @ApiOperation({ summary: 'Get game comments by monitor ID' })
   @ApiParam({ name: 'monitorId', type: 'number', description: 'Monitor ID' })
-  @ApiResponse({ status: 200, description: 'List of features for the monitor', type: [Feature] })
-  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<Feature[]> {
-    return this.featuresService.findByMonitorId(monitorId);
+  @ApiResponse({ status: 200, description: 'List of game comments for the monitor', type: [GameComment] })
+  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<GameComment[]> {
+    return this.gameCommentService.findByMonitorId(monitorId);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get feature by ID' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature found', type: Feature })
-  @ApiResponse({ status: 404, description: 'Feature not found' })
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Feature> {
-    return this.featuresService.findOne(id);
+  @ApiOperation({ summary: 'Get game comment by ID' })
+  @ApiParam({ name: 'id', type: 'number', description: 'Game comment ID' })
+  @ApiResponse({ status: 200, description: 'Game comment found', type: GameComment })
+  @ApiResponse({ status: 404, description: 'Game comment not found' })
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<GameComment> {
+    return this.gameCommentService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update feature' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature updated', type: Feature })
+  @ApiOperation({ summary: 'Update game comment' })
+  @ApiParam({ name: 'id', type: 'number', description: 'Game comment ID' })
+  @ApiResponse({ status: 200, description: 'Game comment updated', type: GameComment })
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateFeatureDto: UpdateFeatureDto,
-  ): Promise<Feature> {
-    return this.featuresService.update(id, updateFeatureDto);
+    @Body() updateGameCommentDto: UpdateGameCommentDto,
+  ): Promise<GameComment> {
+    return this.gameCommentService.update(id, updateGameCommentDto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete feature' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature deleted' })
-  @ApiResponse({ status: 404, description: 'Feature not found' })
+  @ApiOperation({ summary: 'Delete game comment' })
+  @ApiParam({ name: 'id', type: 'number', description: 'Game comment ID' })
+  @ApiResponse({ status: 200, description: 'Game comment deleted' })
+  @ApiResponse({ status: 404, description: 'Game comment not found' })
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.featuresService.remove(id);
+    return this.gameCommentService.remove(id);
   }
 }

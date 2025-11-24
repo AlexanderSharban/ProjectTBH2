@@ -1,53 +1,52 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Feature } from './entities/feature.entity';
-import { CreateFeatureDto } from './dto/create-feature.dto';
-import { UpdateFeatureDto } from './dto/update-feature.dto';
-import { Monitor } from '../monitor/entities/monitor.entity';
+import { NewsComment } from './entities/news-comment.entity';
+import { CreateNewsCommentDto } from './dto/create-news-comment.dto';
+import { UpdateNewsCommentDto } from './dto/update-news-comment.dto';
 
 @Injectable()
-export class FeaturesService {
-  private features: Feature[] = [];
+export class NewsCommentService {
+  private newsComments: NewsComment[] = [];
   private idCounter = 1;
 
-  async create(createFeatureDto: CreateFeatureDto): Promise<Feature> {
-    const feature: Feature = {
+  async create(createNewsCommentDto: CreateNewsCommentDto): Promise<NewsComment> {
+    const newsComment: NewsComment = {
       id: this.idCounter++,
-      ...createFeatureDto,
-      monitor: { id: createFeatureDto.monitorId } as any,
+      ...createNewsCommentDto,
+      monitor: { id: createNewsCommentDto.monitorId } as any,
     };
-    this.features.push(feature);
-    return feature;
+    this.newsComments.push(newsComment);
+    return newsComment;
   }
 
-  async findAll(): Promise<Feature[]> {
-    return this.features;
+  async findAll(): Promise<NewsComment[]> {
+    return this.newsComments;
   }
 
-  async findOne(id: number): Promise<Feature> {
-    const feature = this.features.find(f => f.id === id);
-    if (!feature) {
-      throw new NotFoundException(`Feature with ID ${id} not found`);
+  async findOne(id: number): Promise<NewsComment> {
+    const newsComment = this.newsComments.find(f => f.id === id);
+    if (!newsComment) {
+      throw new NotFoundException(`NewsComment with ID ${id} not found`);
     }
-    return feature;
+    return newsComment;
   }
 
-  async update(id: number, updateFeatureDto: UpdateFeatureDto): Promise<Feature> {
-    const feature = await this.findOne(id);
-    Object.assign(feature, updateFeatureDto);
-    return feature;
+  async update(id: number, updateNewsCommentDto: UpdateNewsCommentDto): Promise<NewsComment> {
+    const newsComment = await this.findOne(id);
+    Object.assign(newsComment, updateNewsCommentDto);
+    return newsComment;
   }
 
   async remove(id: number): Promise<void> {
-    const index = this.features.findIndex(f => f.id === id);
+    const index = this.newsComments.findIndex(f => f.id === id);
     if (index === -1) {
-      throw new NotFoundException(`Feature with ID ${id} not found`);
+      throw new NotFoundException(`NewsComment with ID ${id} not found`);
     }
-    this.features.splice(index, 1);
+    this.newsComments.splice(index, 1);
   }
 
-  async findByMonitorId(monitorId: number): Promise<Feature[]> {
-    return this.features.filter(f => f.monitorId === monitorId);
+  async findByMonitorId(monitorId: number): Promise<NewsComment[]> {
+    return this.newsComments.filter(f => f.monitor.id === monitorId);
   }
 }

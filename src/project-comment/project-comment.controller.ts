@@ -1,63 +1,63 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { FeaturesService } from './feature.service';
-import { CreateFeatureDto } from './dto/create-feature.dto';
-import { UpdateFeatureDto } from './dto/update-feature.dto';
-import { Feature } from './entities/feature.entity';
+import { ProjectCommentService } from './project-comment.service';
+import { CreateProjectCommentDto } from './dto/create-project-comment.dto';
+import { UpdateProjectCommentDto } from './dto/update-project-comment.dto';
+import { ProjectComment } from './entities/project-comment.entity';
 
-@ApiTags('features')
-@Controller('features')
-export class FeaturesController {
-  constructor(private readonly featuresService: FeaturesService) {}
+@ApiTags('project-comments')
+@Controller('project-comments')
+export class ProjectCommentController {
+  constructor(private readonly projectCommentService: ProjectCommentService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new feature' })
-  @ApiResponse({ status: 201, description: 'Feature created successfully', type: Feature })
-  create(@Body() createFeatureDto: CreateFeatureDto): Promise<Feature> {
-    return this.featuresService.create(createFeatureDto);
+  @ApiOperation({ summary: 'Create a new project comment' })
+  @ApiResponse({ status: 201, description: 'Project comment created successfully', type: ProjectComment })
+  create(@Body() createProjectCommentDto: CreateProjectCommentDto): Promise<ProjectComment> {
+    return this.projectCommentService.create(createProjectCommentDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all features with their monitors' })
-  @ApiResponse({ status: 200, description: 'List of all features', type: [Feature] })
-  findAll(): Promise<Feature[]> {
-    return this.featuresService.findAll();
+  @ApiOperation({ summary: 'Get all project comments' })
+  @ApiResponse({ status: 200, description: 'List of all project comments', type: [ProjectComment] })
+  findAll(): Promise<ProjectComment[]> {
+    return this.projectCommentService.findAll();
   }
 
   @Get('monitor/:monitorId')
-  @ApiOperation({ summary: 'Get features by monitor ID' })
+  @ApiOperation({ summary: 'Get project comments by monitor ID' })
   @ApiParam({ name: 'monitorId', type: 'number', description: 'Monitor ID' })
-  @ApiResponse({ status: 200, description: 'List of features for the monitor', type: [Feature] })
-  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<Feature[]> {
-    return this.featuresService.findByMonitorId(monitorId);
+  @ApiResponse({ status: 200, description: 'List of project comments for the monitor', type: [ProjectComment] })
+  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<ProjectComment[]> {
+    return this.projectCommentService.findByMonitorId(monitorId);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get feature by ID' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature found', type: Feature })
-  @ApiResponse({ status: 404, description: 'Feature not found' })
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Feature> {
-    return this.featuresService.findOne(id);
+  @ApiOperation({ summary: 'Get project comment by ID' })
+  @ApiParam({ name: 'id', type: 'number', description: 'Project comment ID' })
+  @ApiResponse({ status: 200, description: 'Project comment found', type: ProjectComment })
+  @ApiResponse({ status: 404, description: 'Project comment not found' })
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<ProjectComment> {
+    return this.projectCommentService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update feature' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature updated', type: Feature })
+  @ApiOperation({ summary: 'Update project comment' })
+  @ApiParam({ name: 'id', type: 'number', description: 'Project comment ID' })
+  @ApiResponse({ status: 200, description: 'Project comment updated', type: ProjectComment })
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateFeatureDto: UpdateFeatureDto,
-  ): Promise<Feature> {
-    return this.featuresService.update(id, updateFeatureDto);
+    @Body() updateProjectCommentDto: UpdateProjectCommentDto,
+  ): Promise<ProjectComment> {
+    return this.projectCommentService.update(id, updateProjectCommentDto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete feature' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature deleted' })
-  @ApiResponse({ status: 404, description: 'Feature not found' })
+  @ApiOperation({ summary: 'Delete project comment' })
+  @ApiParam({ name: 'id', type: 'number', description: 'Project comment ID' })
+  @ApiResponse({ status: 200, description: 'Project comment deleted' })
+  @ApiResponse({ status: 404, description: 'Project comment not found' })
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.featuresService.remove(id);
+    return this.projectCommentService.remove(id);
   }
 }

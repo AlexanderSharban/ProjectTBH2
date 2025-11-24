@@ -1,15 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FeaturesService } from './feature.service';
-import { FeaturesController } from './feature.controller';
-import { Feature } from './entities/feature.entity';
-import { Monitor } from '../monitor/entities/monitor.entity';
+import { NewsCommentService } from './news-comment.service';
+import { NewsCommentController } from './news-comment.controller';
+import { NewsComment } from './entities/news-comment.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Feature, Monitor])
+    TypeOrmModule.forFeature([NewsComment])
   ],
-  controllers: [FeaturesController],
-  providers: [FeaturesService],
+  controllers: [NewsCommentController],
+  providers: [NewsCommentService],
 })
-export class FeaturesModule {}
+export class NewsCommentModule {}

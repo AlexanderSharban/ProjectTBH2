@@ -1,53 +1,54 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Feature } from './entities/feature.entity';
-import { CreateFeatureDto } from './dto/create-feature.dto';
-import { UpdateFeatureDto } from './dto/update-feature.dto';
-import { Monitor } from '../monitor/entities/monitor.entity';
+import { Game } from './entities/game.entity';
+import { CreateGameDto, CreateGameDto } from './dto/create-game.dto';
+import { UpdateGameDto } from './dto/update-game.dto';
+import { Game } from './entities/game.entity';
+import { UpdateGameDto } from './dto/update-game.dto';
 
 @Injectable()
-export class FeaturesService {
-  private features: Feature[] = [];
+export class GamesService {
+  private games: Game[] = [];
   private idCounter = 1;
 
-  async create(createFeatureDto: CreateFeatureDto): Promise<Feature> {
-    const feature: Feature = {
+  async create(createGameDto: CreateGameDto): Promise<Game> {
+    const game: Game = {
       id: this.idCounter++,
-      ...createFeatureDto,
-      monitor: { id: createFeatureDto.monitorId } as any,
+      ...createGameDto,
+      monitor: { id: createGameDto.monitorId } as any,
     };
-    this.features.push(feature);
-    return feature;
+    this.games.push(game);
+    return game;
   }
 
-  async findAll(): Promise<Feature[]> {
-    return this.features;
+  async findAll(): Promise<Game[]> {
+    return this.games;
   }
 
-  async findOne(id: number): Promise<Feature> {
-    const feature = this.features.find(f => f.id === id);
-    if (!feature) {
-      throw new NotFoundException(`Feature with ID ${id} not found`);
+  async findOne(id: number): Promise<Game> {
+    const game = this.games.find(f => f.id === id);
+    if (!game) {
+      throw new NotFoundException(`Game with ID ${id} not found`);
     }
-    return feature;
+    return game;
   }
 
-  async update(id: number, updateFeatureDto: UpdateFeatureDto): Promise<Feature> {
-    const feature = await this.findOne(id);
-    Object.assign(feature, updateFeatureDto);
-    return feature;
+  async update(id: number, updateGameDto: UpdateGameDto): Promise<Game> {
+    const game = await this.findOne(id);
+    Object.assign(game, updateGameDto);
+    return game;
   }
 
   async remove(id: number): Promise<void> {
-    const index = this.features.findIndex(f => f.id === id);
+    const index = this.games.findIndex(f => f.id === id);
     if (index === -1) {
-      throw new NotFoundException(`Feature with ID ${id} not found`);
+      throw new NotFoundException(`Game with ID ${id} not found`);
     }
-    this.features.splice(index, 1);
+    this.games.splice(index, 1);
   }
 
-  async findByMonitorId(monitorId: number): Promise<Feature[]> {
-    return this.features.filter(f => f.monitorId === monitorId);
+  async findByMonitorId(monitorId: number): Promise<Game[]> {
+    return this.games.filter(f => f.monitor.id === monitorId);
   }
 }

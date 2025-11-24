@@ -1,63 +1,63 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { FeaturesService } from './feature.service';
-import { CreateFeatureDto } from './dto/create-feature.dto';
-import { UpdateFeatureDto } from './dto/update-feature.dto';
-import { Feature } from './entities/feature.entity';
+import { NewsService } from './news.service';
+import { CreateNewsDto } from './dto/create-news.dto';
+import { UpdateNewsDto } from './dto/update-news.dto';
+import { News } from './entities/news.entity';
 
-@ApiTags('features')
-@Controller('features')
-export class FeaturesController {
-  constructor(private readonly featuresService: FeaturesService) {}
+@ApiTags('news')
+@Controller('news')
+export class NewsController {
+  constructor(private readonly newsService: NewsService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new feature' })
-  @ApiResponse({ status: 201, description: 'Feature created successfully', type: Feature })
-  create(@Body() createFeatureDto: CreateFeatureDto): Promise<Feature> {
-    return this.featuresService.create(createFeatureDto);
+  @ApiOperation({ summary: 'Create a new news' })
+  @ApiResponse({ status: 201, description: 'News created successfully', type: News })
+  create(@Body() createNewsDto: CreateNewsDto): Promise<News> {
+    return this.newsService.create(createNewsDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all features with their monitors' })
-  @ApiResponse({ status: 200, description: 'List of all features', type: [Feature] })
-  findAll(): Promise<Feature[]> {
-    return this.featuresService.findAll();
+  @ApiOperation({ summary: 'Get all news' })
+  @ApiResponse({ status: 200, description: 'List of all news', type: [News] })
+  findAll(): Promise<News[]> {
+    return this.newsService.findAll();
   }
 
   @Get('monitor/:monitorId')
   @ApiOperation({ summary: 'Get features by monitor ID' })
   @ApiParam({ name: 'monitorId', type: 'number', description: 'Monitor ID' })
-  @ApiResponse({ status: 200, description: 'List of features for the monitor', type: [Feature] })
-  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<Feature[]> {
-    return this.featuresService.findByMonitorId(monitorId);
+  @ApiResponse({ status: 200, description: 'List of news for the monitor', type: [News] })
+  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<News[]> {
+    return this.newsService.findByMonitorId(monitorId);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get feature by ID' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
+  @ApiOperation({ summary: 'Get news by ID' })
+  @ApiParam({ name: 'id', type: 'number', description: 'News ID' })
   @ApiResponse({ status: 200, description: 'Feature found', type: Feature })
-  @ApiResponse({ status: 404, description: 'Feature not found' })
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Feature> {
-    return this.featuresService.findOne(id);
+  @ApiResponse({ status: 404, description: 'News not found' })
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<News> {
+    return this.newsService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update feature' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature updated', type: Feature })
+  @ApiOperation({ summary: 'Update news' })
+  @ApiParam({ name: 'id', type: 'number', description: 'News ID' })
+  @ApiResponse({ status: 200, description: 'News updated', type: News })
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateFeatureDto: UpdateFeatureDto,
-  ): Promise<Feature> {
-    return this.featuresService.update(id, updateFeatureDto);
+    @Body() updateNewsDto: UpdateNewsDto,
+  ): Promise<News> {
+    return this.newsService.update(id, updateNewsDto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete feature' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature deleted' })
-  @ApiResponse({ status: 404, description: 'Feature not found' })
+  @ApiOperation({ summary: 'Delete news' })
+  @ApiParam({ name: 'id', type: 'number', description: 'News ID' })
+  @ApiResponse({ status: 200, description: 'News deleted' })
+  @ApiResponse({ status: 404, description: 'News not found' })
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.featuresService.remove(id);
+    return this.newsService.remove(id);
   }
 }

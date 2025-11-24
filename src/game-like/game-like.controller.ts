@@ -1,44 +1,44 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { FeaturesService } from './feature.service';
-import { CreateFeatureDto } from './dto/create-feature.dto';
-import { UpdateFeatureDto } from './dto/update-feature.dto';
-import { Feature } from './entities/feature.entity';
+import { FeaturesService } from './game-like.service';
+import { CreateGameLikeDto } from './dto/create-game-like.dto';
+import { UpdateGameLikeDto } from './dto/update-game-like.dto';
+import { GameLike } from './entities/game-like.entity';
 
-@ApiTags('features')
-@Controller('features')
-export class FeaturesController {
-  constructor(private readonly featuresService: FeaturesService) {}
+@ApiTags('game-likes')
+@Controller('game-likes')
+export class GameLikeController {
+  constructor(private readonly gameLikeService: GameLikeService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new feature' })
-  @ApiResponse({ status: 201, description: 'Feature created successfully', type: Feature })
-  create(@Body() createFeatureDto: CreateFeatureDto): Promise<Feature> {
-    return this.featuresService.create(createFeatureDto);
+  @ApiOperation({ summary: 'Create a new game like' })
+  @ApiResponse({ status: 201, description: 'Game like created successfully', type: GameLike })
+  create(@Body() createGameLikeDto: CreateGameLikeDto): Promise<GameLike> {
+    return this.gameLikeService.create(createGameLikeDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all features with their monitors' })
-  @ApiResponse({ status: 200, description: 'List of all features', type: [Feature] })
-  findAll(): Promise<Feature[]> {
-    return this.featuresService.findAll();
+  @ApiOperation({ summary: 'Get all game likes' })
+  @ApiResponse({ status: 200, description: 'List of all game likes', type: [GameLike] })
+  findAll(): Promise<GameLike[]> {
+    return this.gameLikeService.findAll();
   }
 
   @Get('monitor/:monitorId')
-  @ApiOperation({ summary: 'Get features by monitor ID' })
+  @ApiOperation({ summary: 'Get game likes by monitor ID' })
   @ApiParam({ name: 'monitorId', type: 'number', description: 'Monitor ID' })
-  @ApiResponse({ status: 200, description: 'List of features for the monitor', type: [Feature] })
-  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<Feature[]> {
-    return this.featuresService.findByMonitorId(monitorId);
+  @ApiResponse({ status: 200, description: 'List of game likes for the monitor', type: [GameLike] })
+  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<GameLike[]> {
+    return this.gameLikeService.findByMonitorId(monitorId);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get feature by ID' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature found', type: Feature })
-  @ApiResponse({ status: 404, description: 'Feature not found' })
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Feature> {
-    return this.featuresService.findOne(id);
+  @ApiOperation({ summary: 'Get game like by ID' })
+  @ApiParam({ name: 'id', type: 'number', description: 'Game like ID' })
+  @ApiResponse({ status: 200, description: 'Game like found', type: GameLike })
+  @ApiResponse({ status: 404, description: 'Game like not found' })
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<GameLike> {
+    return this.gameLikeService.findOne(id);
   }
 
   @Patch(':id')
@@ -47,17 +47,17 @@ export class FeaturesController {
   @ApiResponse({ status: 200, description: 'Feature updated', type: Feature })
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateFeatureDto: UpdateFeatureDto,
-  ): Promise<Feature> {
-    return this.featuresService.update(id, updateFeatureDto);
+    @Body() updateGameLikeDto: UpdateGameLikeDto,
+  ): Promise<GameLike> {
+    return this.gameLikeService.update(id, updateGameLikeDto);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete feature' })
   @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
   @ApiResponse({ status: 200, description: 'Feature deleted' })
-  @ApiResponse({ status: 404, description: 'Feature not found' })
+  @ApiResponse({ status: 404, description: 'Game like not found' })
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.featuresService.remove(id);
+    return this.gameLikeService.remove(id);
   }
 }
