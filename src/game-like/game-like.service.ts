@@ -15,7 +15,7 @@ export class GameLikeService {
       id: this.idCounter++,
       ...createGameLikeDto,
       game: { id: createGameLikeDto.gameId } as any,
-    };
+    } as any;
     this.gameLikes.push(gameLike);
     return gameLike;
   }
