@@ -1,7 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, Index } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Creator } from '../../creator/entities/creator.entity';
 
+@Index(['creatorId', 'createdAt'])
+@Index(['userId'])
+@Index(['creatorId', 'userId'])
 @Entity()
 export class CreatorComment {
 	@PrimaryGeneratedColumn()

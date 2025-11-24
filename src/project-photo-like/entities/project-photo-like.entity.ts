@@ -1,7 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { ProjectPhoto } from '../../project-photo/entities/project-photo.entity';
 
+@Index(['projectPhotoId'])
+@Index(['userId', 'projectPhotoId'], { unique: true })
 @Entity()
 export class ProjectPhotoLike {
 	@PrimaryGeneratedColumn()

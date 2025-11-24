@@ -1,6 +1,8 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 
+@Index(['newsId'])
+@Index(['userId', 'newsId'], { unique: true })
 @Entity()
 export class NewsLike {
 	@PrimaryGeneratedColumn()

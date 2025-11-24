@@ -1,7 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
 import { Project } from '../../project/entities/project.entity';
 
+@Index(['projectId', 'createdAt'])
+@Index(['userId'])
 @Entity()
 export class ProjectComment {
 	@PrimaryGeneratedColumn()
