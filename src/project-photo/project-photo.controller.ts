@@ -1,63 +1,55 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { FeaturesService } from './feature.service';
-import { CreateFeatureDto } from './dto/create-feature.dto';
-import { UpdateFeatureDto } from './dto/update-feature.dto';
-import { Feature } from './entities/feature.entity';
+import { ProjectPhotoService } from './project-photo.service';
+import { CreateProjectPhotoDto } from './dto/create-project-photo.dto';
+import { UpdateProjectPhotoDto } from './dto/update-project-photo.dto';
+import { ProjectPhoto } from './entities/project-photo.entity';
 
-@ApiTags('features')
-@Controller('features')
-export class FeaturesController {
-  constructor(private readonly featuresService: FeaturesService) {}
+@ApiTags('project-photos')
+@Controller('project-photos')
+export class ProjectPhotoController {
+  constructor(private readonly projectPhotoService: ProjectPhotoService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new feature' })
-  @ApiResponse({ status: 201, description: 'Feature created successfully', type: Feature })
-  create(@Body() createFeatureDto: CreateFeatureDto): Promise<Feature> {
-    return this.featuresService.create(createFeatureDto);
+  @ApiOperation({ summary: 'Create a new project photo' })
+  @ApiResponse({ status: 201, description: 'Project photo created successfully', type: ProjectPhoto })
+  create(@Body() createProjectPhotoDto: CreateProjectPhotoDto): Promise<ProjectPhoto> {
+    return this.projectPhotoService.create(createProjectPhotoDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all features with their monitors' })
-  @ApiResponse({ status: 200, description: 'List of all features', type: [Feature] })
-  findAll(): Promise<Feature[]> {
-    return this.featuresService.findAll();
-  }
-
-  @Get('monitor/:monitorId')
-  @ApiOperation({ summary: 'Get features by monitor ID' })
-  @ApiParam({ name: 'monitorId', type: 'number', description: 'Monitor ID' })
-  @ApiResponse({ status: 200, description: 'List of features for the monitor', type: [Feature] })
-  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<Feature[]> {
-    return this.featuresService.findByMonitorId(monitorId);
+  @ApiOperation({ summary: 'Get all project photos' })
+  @ApiResponse({ status: 200, description: 'List of all project photos', type: [ProjectPhoto] })
+  findAll(): Promise<ProjectPhoto[]> {
+    return this.projectPhotoService.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get feature by ID' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature found', type: Feature })
-  @ApiResponse({ status: 404, description: 'Feature not found' })
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Feature> {
-    return this.featuresService.findOne(id);
+  @ApiOperation({ summary: 'Get project photo by ID' })
+  @ApiParam({ name: 'id', type: 'number', description: 'Project photo ID' })
+  @ApiResponse({ status: 200, description: 'Project photo found', type: ProjectPhoto })
+  @ApiResponse({ status: 404, description: 'Project photo not found' })
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<ProjectPhoto> {
+    return this.projectPhotoService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update feature' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature updated', type: Feature })
+  @ApiOperation({ summary: 'Update project photo' })
+  @ApiParam({ name: 'id', type: 'number', description: 'Project photo ID' })
+  @ApiResponse({ status: 200, description: 'Project photo updated', type: ProjectPhoto })
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateFeatureDto: UpdateFeatureDto,
-  ): Promise<Feature> {
-    return this.featuresService.update(id, updateFeatureDto);
+    @Body() updateProjectPhotoDto: UpdateProjectPhotoDto,
+  ): Promise<ProjectPhoto> {
+    return this.projectPhotoService.update(id, updateProjectPhotoDto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete feature' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature deleted' })
-  @ApiResponse({ status: 404, description: 'Feature not found' })
+  @ApiOperation({ summary: 'Delete project photo' })
+  @ApiParam({ name: 'id', type: 'number', description: 'Project photo ID' })
+  @ApiResponse({ status: 200, description: 'Project photo deleted' })
+  @ApiResponse({ status: 404, description: 'Project photo not found' })
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.featuresService.remove(id);
+    return this.projectPhotoService.remove(id);
   }
 }

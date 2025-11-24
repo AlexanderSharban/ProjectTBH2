@@ -8,3 +8,40 @@ services:
       - '3000:3000'
     environment:
       NODE_ENV: production
+      # DB settings for local dockerized Postgres (optional - adjust to your app env keys)
+      DB_HOST: postgres
+      DB_PORT: '5432'
+      DB_USER: tbh
+      DB_PASSWORD: tbhpassword
+      DB_NAME: tbhdb
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: tbh
+      POSTGRES_PASSWORD: tbhpassword
+      POSTGRES_DB: tbhdb
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      # map to 5433 on the host in case host 5432 is in use
+      - '5433:5432'
+
+  pgadmin:
+    image: dpage/pgadmin4:7
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@local
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - '8080:80'
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+volumes:
+  db-data:
+  pgadmin-data:

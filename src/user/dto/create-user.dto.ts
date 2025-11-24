@@ -1,15 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateFeatureDto {
-  @ApiProperty({ example: '27 inches', description: 'Screen diagonal size' })
-  screenSize: string;
+export class CreateUserDto {
+  @ApiProperty({ example: 'user@example.com', description: 'User email address' })
+  email: string;
 
-  @ApiProperty({ example: '1920x1080', description: 'Screen resolution' })
-  resolution: string;
+  @ApiProperty({ example: 'username', description: 'Unique username' })
+  username: string;
 
-  @ApiProperty({ example: 144.00, description: 'Refresh rate in Hz' })
-  refreshRate: number;
-
-  @ApiProperty({ example: 1, description: 'ID of the parent monitor' })
-  monitorId: number;
+  @ApiProperty({ example: 'hashed_password', description: 'Password hash' })
+  passwordHash: string;
 }
