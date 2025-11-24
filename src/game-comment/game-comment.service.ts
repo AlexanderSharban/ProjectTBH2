@@ -1,8 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { GameComment } from './entities/game-comment.entity';
-import { CreateGameCommentDto, CreateGameCommentDto } from './dto/create-game-comment.dto';
+import { CreateGameCommentDto } from './dto/create-game-comment.dto';
+import { UpdateGameCommentDto } from './dto/update-game-comment.dto';
 
 @Injectable()
 export class GameCommentService {
@@ -14,7 +13,7 @@ export class GameCommentService {
       id: this.idCounter++,
       ...createGameCommentDto,
       game: { id: createGameCommentDto.gameId } as any,
-    };
+    } as any;
     this.gameComments.push(gameComment);
     return gameComment;
   }

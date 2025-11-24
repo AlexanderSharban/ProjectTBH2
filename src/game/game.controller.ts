@@ -1,16 +1,14 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { GameService } from './game.controller.spec';
-import { CreateGameDto } from './dto/create-feature.dto';
-import { UpdateFeatureDto } from './dto/update-feature.dto';
-import { Feature } from './entities/feature.entity';
-import { Game } from './entities/game.entity';
+import { GamesService } from './game.service';
+import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
+import { Game } from './entities/game.entity';
 
 @ApiTags('games')
 @Controller('games')
 export class GamesController {
-  constructor(private readonly gamesService: GameService) {}
+  constructor(private readonly gamesService: GamesService) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new game' })
@@ -20,19 +18,12 @@ export class GamesController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all games with their monitors' })
+  @ApiOperation({ summary: 'Get all games' })
   @ApiResponse({ status: 200, description: 'List of all games', type: [Game] })
   findAll(): Promise<Game[]> {
     return this.gamesService.findAll();
   }
-
-  @Get('monitor/:monitorId')
-  @ApiOperation({ summary: 'Get games by monitor ID' })
-  @ApiParam({ name: 'monitorId', type: 'number', description: 'Monitor ID' })
-  @ApiResponse({ status: 200, description: 'List of games for the monitor', type: [Game] })
-  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<Game[]> {
-    return this.gamesService.findByMonitorId(monitorId);
-  }
+  
 
   @Get(':id')
   @ApiOperation({ summary: 'Get game by ID' })

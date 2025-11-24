@@ -18,18 +18,10 @@ export class NewsCommentController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all news comments with their monitors' })
+  @ApiOperation({ summary: 'Get all news comments' })
   @ApiResponse({ status: 200, description: 'List of all news comments', type: [NewsComment] })
   findAll(): Promise<NewsComment[]> {
     return this.newsCommentService.findAll();
-  }
-
-  @Get('monitor/:monitorId')
-  @ApiOperation({ summary: 'Get news comments by monitor ID' })
-  @ApiParam({ name: 'monitorId', type: 'number', description: 'Monitor ID' })
-  @ApiResponse({ status: 200, description: 'List of news comments for the monitor', type: [NewsComment] })
-  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<NewsComment[]> {
-    return this.newsCommentService.findByMonitorId(monitorId);
   }
 
   @Get(':id')

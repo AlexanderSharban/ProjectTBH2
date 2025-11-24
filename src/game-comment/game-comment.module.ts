@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FeaturesService } from './game-comment.service';
+import { GameCommentService } from './game-comment.service';
 import { GameCommentController } from './game-comment.controller';
 import { GameComment } from './entities/game-comment.entity';
 

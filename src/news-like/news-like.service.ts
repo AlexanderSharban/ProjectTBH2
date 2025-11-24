@@ -14,8 +14,8 @@ export class NewsLikeService {
     const newsLike: NewsLike = {
       id: this.idCounter++,
       ...createNewsLikeDto,
-      monitor: { id: createNewsLikeDto.monitorId } as any,
-    };
+      news: { id: createNewsLikeDto.newsId } as any,
+    } as any;
     this.newsLikes.push(newsLike);
     return newsLike;
   }
@@ -46,7 +46,5 @@ export class NewsLikeService {
     this.newsLikes.splice(index, 1);
   }
 
-  async findByMonitorId(monitorId: number): Promise<NewsLike[]> {
-    return this.newsLikes.filter(f => f.monitor.id === monitorId);
-  }
+  
 }

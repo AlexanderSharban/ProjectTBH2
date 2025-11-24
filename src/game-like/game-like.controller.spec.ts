@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FeatureController } from './game-like.controller';
-import { FeatureService } from './feature.service';
+import { GameLikeController } from './game-like.controller';
+import { GameLikeService } from './game-like.service';
 
 describe('GameLikeController', () => {
   let controller: GameLikeController;

@@ -1,11 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Game } from './entities/game.entity';
-import { CreateGameDto, CreateGameDto } from './dto/create-game.dto';
+import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { Game } from './entities/game.entity';
-import { UpdateGameDto } from './dto/update-game.dto';
 
 @Injectable()
 export class GamesService {
@@ -15,9 +11,16 @@ export class GamesService {
   async create(createGameDto: CreateGameDto): Promise<Game> {
     const game: Game = {
       id: this.idCounter++,
-      ...createGameDto,
-      monitor: { id: createGameDto.monitorId } as any,
-    };
+      title: createGameDto.title,
+      slug: createGameDto.slug,
+      description: createGameDto.description,
+      creatorId: createGameDto.creatorId,
+      createdAt: new Date(),
+      creator: null,
+      comments: [],
+      likes: [],
+      userGameScores: [],
+    } as any;
     this.games.push(game);
     return game;
   }
@@ -46,9 +49,5 @@ export class GamesService {
       throw new NotFoundException(`Game with ID ${id} not found`);
     }
     this.games.splice(index, 1);
-  }
-
-  async findByMonitorId(monitorId: number): Promise<Game[]> {
-    return this.games.filter(f => f.monitor.id === monitorId);
   }
 }

@@ -1,63 +1,55 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { FeaturesService } from './feature.service';
-import { CreateFeatureDto } from './dto/create-feature.dto';
-import { UpdateFeatureDto } from './dto/update-feature.dto';
-import { Feature } from './entities/feature.entity';
+import { CreatorLikeService } from './creator-like.service';
+import { CreateCreatorLikeDto } from './dto/create-creator-like.dto';
+import { UpdateCreatorLikeDto } from './dto/update-creator-like.dto';
+import { CreatorLike } from './entities/creator-like.entity';
 
-@ApiTags('features')
-@Controller('features')
-export class FeaturesController {
-  constructor(private readonly featuresService: FeaturesService) {}
+@ApiTags('creator-likes')
+@Controller('creator-likes')
+export class CreatorLikeController {
+  constructor(private readonly creatorLikeService: CreatorLikeService) {}
 
   @Post()
-  @ApiOperation({ summary: 'Create a new feature' })
-  @ApiResponse({ status: 201, description: 'Feature created successfully', type: Feature })
-  create(@Body() createFeatureDto: CreateFeatureDto): Promise<Feature> {
-    return this.featuresService.create(createFeatureDto);
+  @ApiOperation({ summary: 'Create a new creator like' })
+  @ApiResponse({ status: 201, description: 'CreatorLike created successfully', type: CreatorLike })
+  create(@Body() createCreatorLikeDto: CreateCreatorLikeDto): Promise<CreatorLike> {
+    return this.creatorLikeService.create(createCreatorLikeDto);
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all features with their monitors' })
-  @ApiResponse({ status: 200, description: 'List of all features', type: [Feature] })
-  findAll(): Promise<Feature[]> {
-    return this.featuresService.findAll();
-  }
-
-  @Get('monitor/:monitorId')
-  @ApiOperation({ summary: 'Get features by monitor ID' })
-  @ApiParam({ name: 'monitorId', type: 'number', description: 'Monitor ID' })
-  @ApiResponse({ status: 200, description: 'List of features for the monitor', type: [Feature] })
-  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<Feature[]> {
-    return this.featuresService.findByMonitorId(monitorId);
+  @ApiOperation({ summary: 'Get all creator likes' })
+  @ApiResponse({ status: 200, description: 'List of all creator likes', type: [CreatorLike] })
+  findAll(): Promise<CreatorLike[]> {
+    return this.creatorLikeService.findAll();
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Get feature by ID' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature found', type: Feature })
-  @ApiResponse({ status: 404, description: 'Feature not found' })
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<Feature> {
-    return this.featuresService.findOne(id);
+  @ApiOperation({ summary: 'Get creator like by ID' })
+  @ApiParam({ name: 'id', type: 'number', description: 'CreatorLike ID' })
+  @ApiResponse({ status: 200, description: 'CreatorLike found', type: CreatorLike })
+  @ApiResponse({ status: 404, description: 'CreatorLike not found' })
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<CreatorLike> {
+    return this.creatorLikeService.findOne(id);
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update feature' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature updated', type: Feature })
+  @ApiOperation({ summary: 'Update creator like' })
+  @ApiParam({ name: 'id', type: 'number', description: 'CreatorLike ID' })
+  @ApiResponse({ status: 200, description: 'CreatorLike updated', type: CreatorLike })
   update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() updateFeatureDto: UpdateFeatureDto,
-  ): Promise<Feature> {
-    return this.featuresService.update(id, updateFeatureDto);
+    @Body() updateCreatorLikeDto: UpdateCreatorLikeDto,
+  ): Promise<CreatorLike> {
+    return this.creatorLikeService.update(id, updateCreatorLikeDto);
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete feature' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature deleted' })
-  @ApiResponse({ status: 404, description: 'Feature not found' })
+  @ApiOperation({ summary: 'Delete creator like' })
+  @ApiParam({ name: 'id', type: 'number', description: 'CreatorLike ID' })
+  @ApiResponse({ status: 200, description: 'CreatorLike deleted' })
+  @ApiResponse({ status: 404, description: 'CreatorLike not found' })
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.featuresService.remove(id);
+    return this.creatorLikeService.remove(id);
   }
 }

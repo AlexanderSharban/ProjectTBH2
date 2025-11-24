@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { GameCommentController } from './game-comment.controller';
-import { GameCommentService } from './game-comment.controller';
+import { GameCommentService } from './game-comment.service';
 
 describe('GameCommentController', () => {
   let controller: GameCommentController;

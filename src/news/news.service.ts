@@ -14,8 +14,10 @@ export class NewsService {
     const news: News = {
       id: this.idCounter++,
       ...createNewsDto,
-      monitor: { id: createNewsDto.monitorId } as any,
-    };
+      creatorId: createNewsDto.creatorId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    } as any;
     this.news.push(news);
     return news;
   }
@@ -46,7 +48,5 @@ export class NewsService {
     this.news.splice(index, 1);
   }
 
-  async findByMonitorId(monitorId: number): Promise<News[]> {
-    return this.news.filter(f => f.monitor.id === monitorId);
-  }
+  
 }

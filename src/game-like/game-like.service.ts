@@ -35,7 +35,7 @@ export class GameLikeService {
   async update(id: number, updateGameLikeDto: UpdateGameLikeDto): Promise<GameLike> {
     const gameLike = await this.findOne(id);
     Object.assign(gameLike, updateGameLikeDto);
-    return feature;
+    return gameLike;
   }
 
   async remove(id: number): Promise<void> {
@@ -46,7 +46,5 @@ export class GameLikeService {
     this.gameLikes.splice(index, 1);
   }
 
-  async findByMonitorId(monitorId: number): Promise<GameLike[]> {
-    return this.features.filter(f => f.monitorId === monitorId);
-  }
+  
 }

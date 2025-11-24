@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Project } from './entities/project.entity';
-import { CreateFeatureDto } from './dto/create-project.dto';
-import { UpdateFeatureDto, UpdateProjectDto } from './dto/update-project.dto';
+import { CreateProjectDto } from './dto/create-project.dto';
+import { UpdateProjectDto } from './dto/update-project.dto';
 
 
 @Injectable()
@@ -15,8 +15,9 @@ export class ProjectService {
     const project: Project = {
       id: this.idCounter++,
       ...createProjectDto,
-      monitor: { id: createProjectDto.monitorId } as any,
-    };
+      creatorId: createProjectDto.creatorId,
+      createdAt: new Date(),
+    } as any;
     this.projects.push(project);
     return project;
   }
@@ -47,7 +48,5 @@ export class ProjectService {
     this.projects.splice(index, 1);
   }
 
-  async findByMonitorId(monitorId: number): Promise<Project[]> {
-    return this.projects.filter(p => p.monitorId === monitorId);
-  }
+  
 }

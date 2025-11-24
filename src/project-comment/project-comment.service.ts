@@ -14,8 +14,8 @@ export class ProjectCommentService {
     const projectComment: ProjectComment = {
       id: this.idCounter++,
       ...createProjectCommentDto,
-      monitor: { id: createProjectCommentDto.monitorId } as any,
-    };
+      project: { id: createProjectCommentDto.projectId } as any,
+    } as any;
     this.projectComments.push(projectComment);
     return projectComment;
   }

@@ -24,18 +24,10 @@ export class NewsController {
     return this.newsService.findAll();
   }
 
-  @Get('monitor/:monitorId')
-  @ApiOperation({ summary: 'Get features by monitor ID' })
-  @ApiParam({ name: 'monitorId', type: 'number', description: 'Monitor ID' })
-  @ApiResponse({ status: 200, description: 'List of news for the monitor', type: [News] })
-  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<News[]> {
-    return this.newsService.findByMonitorId(monitorId);
-  }
-
   @Get(':id')
   @ApiOperation({ summary: 'Get news by ID' })
   @ApiParam({ name: 'id', type: 'number', description: 'News ID' })
-  @ApiResponse({ status: 200, description: 'Feature found', type: Feature })
+  @ApiResponse({ status: 200, description: 'News found', type: News })
   @ApiResponse({ status: 404, description: 'News not found' })
   findOne(@Param('id', ParseIntPipe) id: number): Promise<News> {
     return this.newsService.findOne(id);

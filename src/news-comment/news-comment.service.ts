@@ -14,8 +14,8 @@ export class NewsCommentService {
     const newsComment: NewsComment = {
       id: this.idCounter++,
       ...createNewsCommentDto,
-      monitor: { id: createNewsCommentDto.monitorId } as any,
-    };
+      news: { id: createNewsCommentDto.newsId } as any,
+    } as any;
     this.newsComments.push(newsComment);
     return newsComment;
   }
@@ -46,7 +46,5 @@ export class NewsCommentService {
     this.newsComments.splice(index, 1);
   }
 
-  async findByMonitorId(monitorId: number): Promise<NewsComment[]> {
-    return this.newsComments.filter(f => f.monitor.id === monitorId);
-  }
+  
 }

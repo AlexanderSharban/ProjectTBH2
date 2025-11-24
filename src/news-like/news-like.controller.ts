@@ -5,8 +5,8 @@ import { CreateNewsLikeDto } from './dto/create-news-like.dto';
 import { UpdateNewsLikeDto } from './dto/update-news-like.dto';
 import { NewsLike } from './entities/news-like.entity';
 
-@ApiTags('features')
-@Controller('news-like')
+@ApiTags('news-likes')
+@Controller('news-likes')
 export class NewsLikeController {
   constructor(private readonly newsLikeService: NewsLikeService) {}
 
@@ -18,19 +18,12 @@ export class NewsLikeController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all news likes with their monitors' })
+  @ApiOperation({ summary: 'Get all news likes' })
   @ApiResponse({ status: 200, description: 'List of all news likes', type: [NewsLike] })
   findAll(): Promise<NewsLike[]> {
     return this.newsLikeService.findAll();
   }
-
-  @Get('monitor/:monitorId')
-  @ApiOperation({ summary: 'Get news likes by monitor ID' })
-  @ApiParam({ name: 'monitorId', type: 'number', description: 'Monitor ID' })
-  @ApiResponse({ status: 200, description: 'List of news likes for the monitor', type: [NewsLike] })
-  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<NewsLike[]> {
-    return this.newsLikeService.findByMonitorId(monitorId);
-  }
+  
 
   @Get(':id')
   @ApiOperation({ summary: 'Get news like by ID' })

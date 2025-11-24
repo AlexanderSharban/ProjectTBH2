@@ -1,15 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FeaturesService } from './feature.service';
-import { FeaturesController } from './feature.controller';
-import { Feature } from './entities/feature.entity';
-import { Monitor } from '../monitor/entities/monitor.entity';
+import { CreatorLikeService } from './creator-like.service';
+import { CreatorLikeController } from './creator-like.controller';
+import { CreatorLike } from './entities/creator-like.entity';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Feature, Monitor])
-  ],
-  controllers: [FeaturesController],
-  providers: [FeaturesService],
+  imports: [TypeOrmModule.forFeature([CreatorLike])],
+  controllers: [CreatorLikeController],
+  providers: [CreatorLikeService],
 })
-export class FeaturesModule {}
+export class CreatorLikeModule {}

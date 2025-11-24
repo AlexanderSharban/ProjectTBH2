@@ -1,53 +1,56 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Feature } from './entities/feature.entity';
-import { CreateFeatureDto } from './dto/create-feature.dto';
-import { UpdateFeatureDto } from './dto/update-feature.dto';
-import { Monitor } from '../monitor/entities/monitor.entity';
+import { Creator } from './entities/creator.entity';
+import { CreateCreatorDto } from './dto/create-creator.dto';
+import { UpdateCreatorDto } from './dto/update-creator.dto';
 
 @Injectable()
-export class FeaturesService {
-  private features: Feature[] = [];
+export class CreatorService {
+  private creators: Creator[] = [];
   private idCounter = 1;
 
-  async create(createFeatureDto: CreateFeatureDto): Promise<Feature> {
-    const feature: Feature = {
+  async create(createCreatorDto: CreateCreatorDto): Promise<Creator> {
+    const creator: Creator = {
       id: this.idCounter++,
-      ...createFeatureDto,
-      monitor: { id: createFeatureDto.monitorId } as any,
-    };
-    this.features.push(feature);
-    return feature;
+      ...createCreatorDto,
+      userId: createCreatorDto.userId,
+      name: createCreatorDto.name,
+      bio: createCreatorDto.bio,
+      avatarUrl: createCreatorDto.avatarUrl,
+      likesCount: 0,
+      commentsCount: 0,
+      createdAt: new Date(),
+    } as any;
+    this.creators.push(creator);
+    return creator;
   }
 
-  async findAll(): Promise<Feature[]> {
-    return this.features;
+  async findAll(): Promise<Creator[]> {
+    return this.creators;
   }
 
-  async findOne(id: number): Promise<Feature> {
-    const feature = this.features.find(f => f.id === id);
-    if (!feature) {
-      throw new NotFoundException(`Feature with ID ${id} not found`);
+  async findOne(id: number): Promise<Creator> {
+    const creator = this.creators.find(c => c.id === id);
+    if (!creator) {
+      throw new NotFoundException(`Creator with ID ${id} not found`);
     }
-    return feature;
+    return creator;
   }
 
-  async update(id: number, updateFeatureDto: UpdateFeatureDto): Promise<Feature> {
-    const feature = await this.findOne(id);
-    Object.assign(feature, updateFeatureDto);
-    return feature;
+  async update(id: number, updateCreatorDto: UpdateCreatorDto): Promise<Creator> {
+    const creator = await this.findOne(id);
+    Object.assign(creator, updateCreatorDto);
+    return creator;
   }
 
   async remove(id: number): Promise<void> {
-    const index = this.features.findIndex(f => f.id === id);
+    const index = this.creators.findIndex(c => c.id === id);
     if (index === -1) {
-      throw new NotFoundException(`Feature with ID ${id} not found`);
+      throw new NotFoundException(`Creator with ID ${id} not found`);
     }
-    this.features.splice(index, 1);
+    this.creators.splice(index, 1);
   }
 
-  async findByMonitorId(monitorId: number): Promise<Feature[]> {
-    return this.features.filter(f => f.monitorId === monitorId);
-  }
+  
 }

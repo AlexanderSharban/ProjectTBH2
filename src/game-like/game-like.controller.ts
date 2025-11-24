@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { FeaturesService } from './game-like.service';
+import { GameLikeService } from './game-like.service';
 import { CreateGameLikeDto } from './dto/create-game-like.dto';
 import { UpdateGameLikeDto } from './dto/update-game-like.dto';
 import { GameLike } from './entities/game-like.entity';
@@ -24,14 +24,6 @@ export class GameLikeController {
     return this.gameLikeService.findAll();
   }
 
-  @Get('monitor/:monitorId')
-  @ApiOperation({ summary: 'Get game likes by monitor ID' })
-  @ApiParam({ name: 'monitorId', type: 'number', description: 'Monitor ID' })
-  @ApiResponse({ status: 200, description: 'List of game likes for the monitor', type: [GameLike] })
-  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<GameLike[]> {
-    return this.gameLikeService.findByMonitorId(monitorId);
-  }
-
   @Get(':id')
   @ApiOperation({ summary: 'Get game like by ID' })
   @ApiParam({ name: 'id', type: 'number', description: 'Game like ID' })
@@ -42,9 +34,9 @@ export class GameLikeController {
   }
 
   @Patch(':id')
-  @ApiOperation({ summary: 'Update feature' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature updated', type: Feature })
+  @ApiOperation({ summary: 'Update game like' })
+  @ApiParam({ name: 'id', type: 'number', description: 'Game like ID' })
+  @ApiResponse({ status: 200, description: 'Game like updated', type: GameLike })
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateGameLikeDto: UpdateGameLikeDto,
@@ -53,9 +45,9 @@ export class GameLikeController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete feature' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Feature ID' })
-  @ApiResponse({ status: 200, description: 'Feature deleted' })
+  @ApiOperation({ summary: 'Delete game like' })
+  @ApiParam({ name: 'id', type: 'number', description: 'Game like ID' })
+  @ApiResponse({ status: 200, description: 'Game like deleted' })
   @ApiResponse({ status: 404, description: 'Game like not found' })
   remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.gameLikeService.remove(id);

@@ -23,14 +23,7 @@ export class ProjectCommentController {
   findAll(): Promise<ProjectComment[]> {
     return this.projectCommentService.findAll();
   }
-
-  @Get('monitor/:monitorId')
-  @ApiOperation({ summary: 'Get project comments by monitor ID' })
-  @ApiParam({ name: 'monitorId', type: 'number', description: 'Monitor ID' })
-  @ApiResponse({ status: 200, description: 'List of project comments for the monitor', type: [ProjectComment] })
-  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<ProjectComment[]> {
-    return this.projectCommentService.findByMonitorId(monitorId);
-  }
+  
 
   @Get(':id')
   @ApiOperation({ summary: 'Get project comment by ID' })

@@ -8,7 +8,7 @@ import { Project } from './entities/project.entity';
 @ApiTags('projects')
 @Controller('projects')
 export class ProjectsController {
-  constructor(private readonly projectsService: ProjectsService) {}
+  constructor(private readonly projectsService: ProjectService) {}
 
   @Post()
   @ApiOperation({ summary: 'Create a new project' })
@@ -18,18 +18,10 @@ export class ProjectsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all projects with their monitors' })
+  @ApiOperation({ summary: 'Get all projects' })
   @ApiResponse({ status: 200, description: 'List of all projects', type: [Project] })
   findAll(): Promise<Project[]> {
     return this.projectsService.findAll();
-  }
-
-  @Get('monitor/:monitorId')
-  @ApiOperation({ summary: 'Get projects by monitor ID' })
-  @ApiParam({ name: 'monitorId', type: 'number', description: 'Monitor ID' })
-  @ApiResponse({ status: 200, description: 'List of projects for the monitor', type: [Project] })
-  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<Project[]> {
-    return this.projectsService.findByMonitorId(monitorId);
   }
 
   @Get(':id')

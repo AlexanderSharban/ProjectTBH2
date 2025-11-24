@@ -1,11 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
-import { GameComment } from './game-comment.service';
+import { GameCommentService } from './game-comment.service';
 import { CreateGameCommentDto } from './dto/create-game-comment.dto';
 import { UpdateGameCommentDto } from './dto/update-game-comment.dto';
 import { GameComment } from './entities/game-comment.entity';
-import { CreateGameCommentDto } from './dto/create-game-comment.dto';
-import { UpdateGameCommentDto } from './dto/update-game-comment.dto';
 
 @ApiTags('game-comments')
 @Controller('game-comments')
@@ -20,18 +18,10 @@ export class GameCommentController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all game comments with their monitors' })
+  @ApiOperation({ summary: 'Get all game comments' })
   @ApiResponse({ status: 200, description: 'List of all game comments', type: [GameComment] })
   findAll(): Promise<GameComment[]> {
     return this.gameCommentService.findAll();
-  }
-
-  @Get('monitor/:monitorId')
-  @ApiOperation({ summary: 'Get game comments by monitor ID' })
-  @ApiParam({ name: 'monitorId', type: 'number', description: 'Monitor ID' })
-  @ApiResponse({ status: 200, description: 'List of game comments for the monitor', type: [GameComment] })
-  findByMonitorId(@Param('monitorId', ParseIntPipe) monitorId: number): Promise<GameComment[]> {
-    return this.gameCommentService.findByMonitorId(monitorId);
   }
 
   @Get(':id')
