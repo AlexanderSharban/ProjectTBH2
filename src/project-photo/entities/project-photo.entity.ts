@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { Project } from '../../project/entities/project.entity';
-import { ProjectPhotoLike } from '../../project-photo-like.entity/entities/project-photo-like.entity';
+import { ProjectPhotoLike } from '../../project-photo-like/entities/project-photo-like.entity';
 
 @Entity()
 export class ProjectPhoto {

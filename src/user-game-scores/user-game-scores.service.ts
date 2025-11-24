@@ -1,53 +1,51 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Feature } from './entities/feature.entity';
-import { CreateFeatureDto } from './dto/create-feature.dto';
-import { UpdateFeatureDto } from './dto/update-feature.dto';
-import { Monitor } from '../monitor/entities/monitor.entity';
+import { UserGameScores } from './entities/user-game-scores.entity';
+import { CreateUserGameScoresDto } from './dto/create-user-game-scores.dto';
+import { UpdateUserGameScoresDto } from './dto/update-user-game-scores.dto';
 
 @Injectable()
-export class FeaturesService {
-  private features: Feature[] = [];
+export class UserGameScoresService {
+  private items: UserGameScores[] = [];
   private idCounter = 1;
 
-  async create(createFeatureDto: CreateFeatureDto): Promise<Feature> {
-    const feature: Feature = {
+  async create(createDto: CreateUserGameScoresDto): Promise<UserGameScores> {
+    const record: UserGameScores = {
       id: this.idCounter++,
-      ...createFeatureDto,
-      monitor: { id: createFeatureDto.monitorId } as any,
-    };
-    this.features.push(feature);
-    return feature;
+      userId: createDto.userId,
+      gameId: createDto.gameId,
+      maxScore: createDto.maxScore,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      user: { id: createDto.userId } as any,
+      game: { id: createDto.gameId } as any,
+    } as any;
+    this.items.push(record);
+    return record;
   }
 
-  async findAll(): Promise<Feature[]> {
-    return this.features;
+  async findAll(): Promise<UserGameScores[]> {
+    return this.items;
   }
 
-  async findOne(id: number): Promise<Feature> {
-    const feature = this.features.find(f => f.id === id);
-    if (!feature) {
-      throw new NotFoundException(`Feature with ID ${id} not found`);
-    }
-    return feature;
+  async findOne(id: number): Promise<UserGameScores> {
+    const rec = this.items.find(r => r.id === id);
+    if (!rec) throw new NotFoundException(`UserGameScores with ID ${id} not found`);
+    return rec;
   }
 
-  async update(id: number, updateFeatureDto: UpdateFeatureDto): Promise<Feature> {
-    const feature = await this.findOne(id);
-    Object.assign(feature, updateFeatureDto);
-    return feature;
+  async update(id: number, updateDto: UpdateUserGameScoresDto): Promise<UserGameScores> {
+    const rec = await this.findOne(id);
+    Object.assign(rec, updateDto, { updatedAt: new Date() });
+    return rec;
   }
 
   async remove(id: number): Promise<void> {
-    const index = this.features.findIndex(f => f.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`Feature with ID ${id} not found`);
-    }
-    this.features.splice(index, 1);
+    const idx = this.items.findIndex(r => r.id === id);
+    if (idx === -1) throw new NotFoundException(`UserGameScores with ID ${id} not found`);
+    this.items.splice(idx, 1);
   }
 
-  async findByMonitorId(monitorId: number): Promise<Feature[]> {
-    return this.features.filter(f => f.monitorId === monitorId);
+  async findByGameId(gameId: number): Promise<UserGameScores[]> {
+    return this.items.filter(r => r.gameId === gameId);
   }
 }

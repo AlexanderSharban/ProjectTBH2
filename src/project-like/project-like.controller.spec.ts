@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { FeatureController } from './feature.controller';
-import { FeatureService } from './feature.service';
+import { ProjectLikeController } from './project-like.controller';
+import { ProjectLikeService } from './project-like.service';
 
-describe('FeatureController', () => {
-  let controller: FeatureController;
+describe('ProjectLikeController', () => {
+  let controller: ProjectLikeController;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      controllers: [FeatureController],
-      providers: [FeatureService],
+      controllers: [ProjectLikeController],
+      providers: [ProjectLikeService],
     }).compile();
 
-    controller = module.get<FeatureController>(FeatureController);
+    controller = module.get<ProjectLikeController>(ProjectLikeController);
   });
 
   it('should be defined', () => {

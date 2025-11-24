@@ -1,6 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
-import { Game } from '../../game/entities/game.entity';
 
 @Entity()
 export class UserGameScores {
@@ -25,8 +24,4 @@ export class UserGameScores {
 	@ManyToOne(() => User, user => user.userGameScores)
 	@JoinColumn({ name: 'user_id' })
 	user: User;
-
-	@ManyToOne(() => Game, game => game.userGameScores)
-	@JoinColumn({ name: 'game_id' })
-	game: Game;
 }

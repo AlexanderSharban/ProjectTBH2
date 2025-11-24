@@ -1,53 +1,45 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Feature } from './entities/feature.entity';
-import { CreateFeatureDto } from './dto/create-feature.dto';
-import { UpdateFeatureDto } from './dto/update-feature.dto';
-import { Monitor } from '../monitor/entities/monitor.entity';
+import { ProjectPhotoLike } from './entities/project-photo-like.entity';
+import { CreateProjectPhotoLikeDto } from './dto/create-project-photo-like.dto';
+import { UpdateProjectPhotoLikeDto } from './dto/update-project-photo-like.dto';
 
 @Injectable()
-export class FeaturesService {
-  private features: Feature[] = [];
+export class ProjectPhotoLikeService {
+  private items: ProjectPhotoLike[] = [];
   private idCounter = 1;
 
-  async create(createFeatureDto: CreateFeatureDto): Promise<Feature> {
-    const feature: Feature = {
+  async create(dto: CreateProjectPhotoLikeDto): Promise<ProjectPhotoLike> {
+    const rec: ProjectPhotoLike = {
       id: this.idCounter++,
-      ...createFeatureDto,
-      monitor: { id: createFeatureDto.monitorId } as any,
-    };
-    this.features.push(feature);
-    return feature;
+      userId: dto.userId,
+      projectPhotoId: dto.projectPhotoId,
+      createdAt: new Date(),
+      user: { id: dto.userId } as any,
+      projectPhoto: { id: dto.projectPhotoId } as any,
+    } as any;
+    this.items.push(rec);
+    return rec;
   }
 
-  async findAll(): Promise<Feature[]> {
-    return this.features;
+  async findAll(): Promise<ProjectPhotoLike[]> {
+    return this.items;
   }
 
-  async findOne(id: number): Promise<Feature> {
-    const feature = this.features.find(f => f.id === id);
-    if (!feature) {
-      throw new NotFoundException(`Feature with ID ${id} not found`);
-    }
-    return feature;
+  async findOne(id: number): Promise<ProjectPhotoLike> {
+    const r = this.items.find(i => i.id === id);
+    if (!r) throw new NotFoundException(`ProjectPhotoLike with ID ${id} not found`);
+    return r;
   }
 
-  async update(id: number, updateFeatureDto: UpdateFeatureDto): Promise<Feature> {
-    const feature = await this.findOne(id);
-    Object.assign(feature, updateFeatureDto);
-    return feature;
+  async update(id: number, dto: UpdateProjectPhotoLikeDto): Promise<ProjectPhotoLike> {
+    const r = await this.findOne(id);
+    Object.assign(r, dto);
+    return r;
   }
 
   async remove(id: number): Promise<void> {
-    const index = this.features.findIndex(f => f.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`Feature with ID ${id} not found`);
-    }
-    this.features.splice(index, 1);
-  }
-
-  async findByMonitorId(monitorId: number): Promise<Feature[]> {
-    return this.features.filter(f => f.monitorId === monitorId);
+    const idx = this.items.findIndex(i => i.id === id);
+    if (idx === -1) throw new NotFoundException(`ProjectPhotoLike with ID ${id} not found`);
+    this.items.splice(idx, 1);
   }
 }

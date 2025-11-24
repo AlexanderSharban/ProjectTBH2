@@ -6,7 +6,7 @@ import { GameComment } from '../../game-comment/entities/game-comment.entity';
 import { GameLike } from '../../game-like/entities/game-like.entity';
 import { ProjectComment } from '../../project-comment/entities/project-comment.entity';
 import { ProjectLike } from '../../project-like/entities/project-like.entity';
-import { ProjectPhotoLike } from '../../project-photo-like.entity/entities/project-photo-like.entity';
+import { ProjectPhotoLike } from '../../project-photo-like/entities/project-photo-like.entity';
 import { NewsComment } from '../../news-comment/entities/news-comment.entity';
 import { NewsLike } from '../../news-like/entities/news-like.entity';
 import { UserGameScores } from '../../user-game-scores/entities/user-game-scores.entity';
