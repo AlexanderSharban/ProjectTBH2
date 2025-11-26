@@ -72,6 +72,56 @@ With Mau, you can deploy your application in just a few clicks, allowing you to 
 
 ## Resources
 
+## Quickstart: Postgres + pgAdmin (docker-compose)
+
+This project includes a `docker-compose.yml` with a Postgres service and pgAdmin.
+
+1. Start services:
+
+```powershell
+docker-compose up -d
+```
+
+2. Open pgAdmin UI: http://localhost:8080
+
+   - Email: `admin@local`
+   - Password: `admin`
+
+3. Add server in pgAdmin:
+
+   - If you are using the bundled `pgadmin` service (pgAdmin in Docker):
+     - Host: `postgres`
+     - Port: `5432`
+     - Username: `tbh`
+     - Password: `1111`
+     - Maintenance DB: `tbhdb`
+
+   - If you use pgAdmin on the host to connect to the dockerized Postgres:
+     - Host: `localhost`
+     - Port: `5433` (mapped host port)
+     - Username: `tbh`
+     - Password: `tbhpassword`
+     - Database: `tbhdb`
+
+4. Run the app locally (app will read DB config from env vars):
+
+```powershell
+npm install
+npm run start:dev
+```
+
+Environment variables supported (defaults used if unset):
+
+```
+DB_HOST=localhost (use `postgres` when running inside docker-compose)
+DB_PORT=5433
+DB_USER=tbh
+DB_PASSWORD=tbhpassword
+DB_NAME=tbhdb
+```
+
+Note: `synchronize: true` is set for convenience in development. Do not use it in production — use migrations instead.
+
 Check out a few resources that may come in handy when working with NestJS:
 
 - Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.

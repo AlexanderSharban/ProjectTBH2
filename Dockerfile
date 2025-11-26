@@ -1,7 +1,7 @@
 # Dockerfile
 
 # Укажите базовый образ
-FROM node:14
+FROM node:18
 
 # Установите рабочую директорию
 WORKDIR /usr/src/app
@@ -10,7 +10,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Установите зависимости
-RUN npm install
+RUN npm ci --silent
 
 # Скопируйте остальные файлы
 COPY . .

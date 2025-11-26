@@ -2,46 +2,43 @@ version: '3'
 services:
   app:
     build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - '3000:3000'
-    environment:
-      NODE_ENV: production
-      # DB settings for local dockerized Postgres (optional - adjust to your app env keys)
-      DB_HOST: postgres
-      DB_PORT: '5432'
-      DB_USER: tbh
-      DB_PASSWORD: tbhpassword
-      DB_NAME: tbhdb
-    depends_on:
-      - postgres
+      version: '3.8'
 
-  postgres:
-    image: postgres:15
-    restart: unless-stopped
-    environment:
-      POSTGRES_USER: tbh
-      POSTGRES_PASSWORD: tbhpassword
-      POSTGRES_DB: tbhdb
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    ports:
-      # map to 5433 on the host in case host 5432 is in use
-      - '5433:5432'
+      services:
+        db:
+          version: '3.8'
 
-  pgadmin:
-    image: dpage/pgadmin4:7
-    restart: unless-stopped
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@local
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - '8080:80'
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    depends_on:
-      - postgres
-volumes:
-  db-data:
-  pgadmin-data:
+          services:
+            db:
+              image: postgres:15
+              container_name: postgres_db
+              restart: always
+              environment:
+                POSTGRES_USER: postgres
+                POSTGRES_PASSWORD: '1111'
+                POSTGRES_DB: epdb
+              ports:
+                # mapped to 5433 on the host to avoid conflicts with local Postgres; change to '5432:5432' if you want host 5432
+                - '5433:5432'
+              volumes:
+                - postgres_data:/var/lib/postgresql/data
+
+            app:
+              build:
+                context: .
+                dockerfile: Dockerfile
+              container_name: nest_app
+              restart: always
+              ports:
+                - '3000:3000'
+              environment:
+                DB_HOST: db
+                DB_PORT: '5432'
+                DB_USER: postgres
+                DB_PASSWORD: '1111'
+                DB_NAME: epdb
+              depends_on:
+                - db
+
+          volumes:
+            postgres_data:
