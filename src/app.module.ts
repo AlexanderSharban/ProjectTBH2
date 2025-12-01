@@ -21,18 +21,15 @@ import { UserGameScoresModule } from './user-game-scores/user-game-scores.module
 
 @Module({
   imports: [
-        // TypeORM root module provides DataSource to repository providers
-        // Configure Postgres via environment variables. Defaults are set to
-        // the docker-compose values used in this repo (DB_HOST=postgres, DB_PORT=5432).
         TypeOrmModule.forRoot({
           type: 'postgres',
           host: process.env.DB_HOST || 'localhost',
           port: +(process.env.DB_PORT || 5433),
           username: process.env.DB_USER || 'postgres',
           password: process.env.DB_PASSWORD || '1111',
-          database: process.env.DB_NAME || 'epdb',
+          database: process.env.DB_NAME || 'PGfTBH',
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
-          synchronize: true, // dev only — use migrations in production
+          synchronize: true, 
           logging: false,
         }),
     GamesModule,

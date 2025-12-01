@@ -18,7 +18,6 @@ services:
                 POSTGRES_PASSWORD: '1111'
                 POSTGRES_DB: epdb
               ports:
-                # mapped to 5433 on the host to avoid conflicts with local Postgres; change to '5432:5432' if you want host 5432
                 - '5433:5432'
               volumes:
                 - postgres_data:/var/lib/postgresql/data
