@@ -20,6 +20,10 @@ export class UserService {
     return user;
   }
 
+  async findByEmail(email: string): Promise<User | undefined> {
+    return this.items.find(u => u.email === email);
+  }
+
   async findAll(): Promise<User[]> {
     return this.items;
   }
