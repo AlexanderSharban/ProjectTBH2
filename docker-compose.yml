@@ -1,43 +1,58 @@
-version: '3'
 services:
-  app:
+  db:
+    image: postgres:16
+    container_name: web2-db
+    hostname: app-db
+    restart: unless-stopped
+    ports:
+      - 1111:5432
+    profiles:
+      - db
+    environment:
+        POSTGRES_USER: web2user
+        POSTGRES_PASSWORD: web2password
+        POSTGRES_DB: web2db
+    networks:
+      - web2-network
+
+  pg-admin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: unless-stopped
+    ports:
+      - 8888:80
+    profiles:
+      - pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@domain.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    networks:
+      - web2-network
+    depends_on:
+      - db
+
+  web2-app:
+    image: web2-app:v1.0.1
+    container_name: web2-app
     build:
-      version: '3.8'
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    profiles:
+      - app
+    ports:
+      - 1234:3210
+    environment:
+      DATABASE_HOST: db
+      DATABASE_PORT: 5432
+      DATABASE_USER: web2user
+      DATABASE_PASSWORD: web2password
+      DATABASE_NAME: web2db
+    depends_on:
+      - db
+    networks:
+      - web2-network
 
-      services:
-        db:
-          version: '3.8'
-
-          services:
-            db:
-              image: postgres:15
-              container_name: postgres_db
-              restart: always
-              environment:
-                POSTGRES_USER: postgres
-                POSTGRES_PASSWORD: '1111'
-                POSTGRES_DB: epdb
-              ports:
-                - '5433:5432'
-              volumes:
-                - postgres_data:/var/lib/postgresql/data
-
-            app:
-              build:
-                context: .
-                dockerfile: Dockerfile
-              container_name: nest_app
-              restart: always
-              ports:
-                - '3000:3000'
-              environment:
-                DB_HOST: db
-                DB_PORT: '5432'
-                DB_USER: postgres
-                DB_PASSWORD: '1111'
-                DB_NAME: epdb
-              depends_on:
-                - db
-
-          volumes:
-            postgres_data:
+networks:
+  web2-network:
+    driver: bridge
