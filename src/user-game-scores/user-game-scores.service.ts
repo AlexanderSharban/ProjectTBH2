@@ -1,51 +1,78 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { UserGameScores } from './entities/user-game-scores.entity';
 import { CreateUserGameScoresDto } from './dto/create-user-game-scores.dto';
 import { UpdateUserGameScoresDto } from './dto/update-user-game-scores.dto';
 
 @Injectable()
 export class UserGameScoresService {
-  private items: UserGameScores[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(UserGameScores)
+    private userGameScoresRepository: Repository<UserGameScores>,
+  ) {}
 
   async create(createDto: CreateUserGameScoresDto): Promise<UserGameScores> {
-    const record: UserGameScores = {
-      id: this.idCounter++,
+    // Check if score exists, if yes, update if new score is higher
+    const existing = await this.userGameScoresRepository.findOne({
+      where: { userId: createDto.userId, gameId: createDto.gameId },
+    });
+
+    if (existing) {
+      if (createDto.score > existing.maxScore) {
+        existing.maxScore = createDto.score;
+        existing.updatedAt = new Date();
+        return this.userGameScoresRepository.save(existing);
+      }
+      return existing;
+    }
+
+    const userGameScore = this.userGameScoresRepository.create({
       userId: createDto.userId,
       gameId: createDto.gameId,
-      maxScore: createDto.maxScore,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      user: { id: createDto.userId } as any,
-      game: { id: createDto.gameId } as any,
-    } as any;
-    this.items.push(record);
-    return record;
+      maxScore: createDto.score,
+    });
+    return this.userGameScoresRepository.save(userGameScore);
   }
 
   async findAll(): Promise<UserGameScores[]> {
-    return this.items;
+    return this.userGameScoresRepository.find({ relations: ['user', 'game'] });
   }
 
   async findOne(id: number): Promise<UserGameScores> {
-    const rec = this.items.find(r => r.id === id);
-    if (!rec) throw new NotFoundException(`UserGameScores with ID ${id} not found`);
-    return rec;
+    const userGameScore = await this.userGameScoresRepository.findOne({
+      where: { id },
+      relations: ['user', 'game'],
+    });
+    if (!userGameScore) {
+      throw new NotFoundException(`UserGameScores with ID ${id} not found`);
+    }
+    return userGameScore;
   }
 
   async update(id: number, updateDto: UpdateUserGameScoresDto): Promise<UserGameScores> {
-    const rec = await this.findOne(id);
-    Object.assign(rec, updateDto, { updatedAt: new Date() });
-    return rec;
+    const userGameScore = await this.findOne(id);
+    Object.assign(userGameScore, updateDto, { updatedAt: new Date() });
+    return this.userGameScoresRepository.save(userGameScore);
   }
 
   async remove(id: number): Promise<void> {
-    const idx = this.items.findIndex(r => r.id === id);
-    if (idx === -1) throw new NotFoundException(`UserGameScores with ID ${id} not found`);
-    this.items.splice(idx, 1);
+    const userGameScore = await this.findOne(id);
+    await this.userGameScoresRepository.remove(userGameScore);
   }
 
   async findByGameId(gameId: number): Promise<UserGameScores[]> {
-    return this.items.filter(r => r.gameId === gameId);
+    return this.userGameScoresRepository.find({
+      where: { gameId },
+      relations: ['user', 'game'],
+      order: { maxScore: 'DESC' },
+    });
+  }
+
+  async findByUserId(userId: number): Promise<UserGameScores[]> {
+    return this.userGameScoresRepository.find({
+      where: { userId },
+      relations: ['user', 'game'],
+    });
   }
 }

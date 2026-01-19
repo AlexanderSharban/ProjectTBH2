@@ -1,6 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
-import { ProjectPhoto } from '../../project-photo/entities/project-photo.entity';
 
 @Index(['projectPhotoId'])
 @Index(['userId', 'projectPhotoId'], { unique: true })
@@ -22,7 +21,7 @@ export class ProjectPhotoLike {
 		@JoinColumn({ name: 'user_id' })
 		user: User;
 
-		@ManyToOne(() => ProjectPhoto, photo => photo.likes)
-		@JoinColumn({ name: 'project_photo_id' })
-		projectPhoto: ProjectPhoto;
+	@ManyToOne('ProjectPhoto', 'likes')
+	@JoinColumn({ name: 'project_photo_id' })
+	projectPhoto: any;
 }

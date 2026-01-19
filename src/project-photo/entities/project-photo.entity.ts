@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { Project } from '../../project/entities/project.entity';
-import { ProjectPhotoLike } from '../../project-photo-like/entities/project-photo-like.entity';
+import { ProjectPhotoComment } from '../../project-photo-comment/entities/project-photo-comment.entity';
 
 @Entity()
 export class ProjectPhoto {
@@ -22,8 +22,11 @@ export class ProjectPhoto {
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 
-    @OneToMany(() => ProjectPhotoLike, like => like.projectPhoto)
-    likes: ProjectPhotoLike[];
+    @OneToMany('ProjectPhotoLike', 'projectPhoto')
+    likes: any[];
+
+    @OneToMany('ProjectPhotoComment', 'projectPhoto')
+    comments: any[];
 
         @ManyToOne(() => Project, project => project.photos)
         @JoinColumn({ name: 'project_id' })

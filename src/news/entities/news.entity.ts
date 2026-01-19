@@ -1,5 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Creator } from '../../creator/entities/creator.entity';
+import { NewsComment } from '../../news-comment/entities/news-comment.entity';
+import { NewsLike } from '../../news-like/entities/news-like.entity';
 
 @Entity()
 export class News {
@@ -30,4 +32,10 @@ export class News {
 	@ManyToOne(() => Creator, creator => creator.news)
 	@JoinColumn({ name: 'creator_id' })
 	creator: Creator;
+
+	@OneToMany(() => NewsComment, comment => comment.news)
+	comments: NewsComment[];
+
+	@OneToMany(() => NewsLike, like => like.news)
+	likes: NewsLike[];
 }

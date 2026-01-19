@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ThrottlerModule } from '@nestjs/throttler';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -18,16 +19,19 @@ import { CreatorCommentModule } from './creator-comment/creator-comment.module';
 import { CreatorLikeModule } from './creator-like/creator-like.module';
 import { UserModule } from './user/user.module';
 import { UserGameScoresModule } from './user-game-scores/user-game-scores.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000, // 1 minute
+        limit: 10, // 10 requests per minute
+      },
+    ]),
         TypeOrmModule.forRoot({
-          type: 'postgres',
-          host: process.env.DB_HOST || 'localhost',
-          port: +(process.env.DB_PORT || 1111),
-          username: process.env.DB_USER || 'web2user',
-          password: process.env.DB_PASSWORD || 'web2password',
-          database: process.env.DB_NAME || 'web2db',
+          type: 'sqlite',
+          database: 'database.sqlite',
           entities: [__dirname + '/**/*.entity{.ts,.js}'],
           synchronize: true, 
           logging: false,
@@ -45,6 +49,9 @@ import { UserGameScoresModule } from './user-game-scores/user-game-scores.module
     CreatorModule,
     CreatorCommentModule,
     CreatorLikeModule,
+    UserModule,
+    UserGameScoresModule,
+    AuthModule,
     UserModule,
     UserGameScoresModule,
   ],

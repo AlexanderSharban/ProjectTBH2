@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn, Index } from 'typeorm';
 import { User } from '../../user/entities/user.entity';
+import { News } from '../../news/entities/news.entity';
 
 @Index(['newsId'])
 @Index(['userId', 'newsId'], { unique: true })
@@ -20,4 +21,8 @@ export class NewsLike {
 	@ManyToOne(() => User, user => user.newsLikes)
 	@JoinColumn({ name: 'user_id' })
 	user: User;
+
+	@ManyToOne(() => News, news => news.likes)
+	@JoinColumn({ name: 'news_id' })
+	news: News;
 }

@@ -7,6 +7,6 @@ export class CreateUserGameScoresDto {
   @ApiProperty({ example: 1, description: 'Game ID' })
   gameId: number;
 
-  @ApiProperty({ example: 9999, description: 'Max score' })
-  maxScore: number;
+  @ApiProperty({ example: 9999, description: 'Score' })
+  score: number;
 }
