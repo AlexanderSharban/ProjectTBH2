@@ -75,7 +75,7 @@ const LoginPage = () => {
                 style={{
                   padding: '15px 30px',
                   backgroundColor: '#FF4444',
-                  color: 'white',
+                  color: '#00FFAA',
                   border: 'none',
                   borderRadius: '4px',
                   cursor: 'pointer',

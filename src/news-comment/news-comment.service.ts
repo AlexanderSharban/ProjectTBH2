@@ -7,25 +7,25 @@ import { UpdateNewsCommentDto } from './dto/update-news-comment.dto';
 
 @Injectable()
 export class NewsCommentService {
-  private newsComments: NewsComment[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(NewsComment)
+    private newsCommentRepository: Repository<NewsComment>,
+  ) {}
 
   async create(createNewsCommentDto: CreateNewsCommentDto): Promise<NewsComment> {
-    const newsComment: NewsComment = {
-      id: this.idCounter++,
-      ...createNewsCommentDto,
-      news: { id: createNewsCommentDto.newsId } as any,
-    } as any;
-    this.newsComments.push(newsComment);
-    return newsComment;
+    const newsComment = this.newsCommentRepository.create(createNewsCommentDto);
+    return this.newsCommentRepository.save(newsComment);
   }
 
   async findAll(): Promise<NewsComment[]> {
-    return this.newsComments;
+    return this.newsCommentRepository.find({ relations: ['user', 'news'] });
   }
 
   async findOne(id: number): Promise<NewsComment> {
-    const newsComment = this.newsComments.find(f => f.id === id);
+    const newsComment = await this.newsCommentRepository.findOne({
+      where: { id },
+      relations: ['user', 'news'],
+    });
     if (!newsComment) {
       throw new NotFoundException(`NewsComment with ID ${id} not found`);
     }
@@ -35,16 +35,19 @@ export class NewsCommentService {
   async update(id: number, updateNewsCommentDto: UpdateNewsCommentDto): Promise<NewsComment> {
     const newsComment = await this.findOne(id);
     Object.assign(newsComment, updateNewsCommentDto);
-    return newsComment;
+    return this.newsCommentRepository.save(newsComment);
   }
 
   async remove(id: number): Promise<void> {
-    const index = this.newsComments.findIndex(f => f.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`NewsComment with ID ${id} not found`);
-    }
-    this.newsComments.splice(index, 1);
+    const newsComment = await this.findOne(id);
+    await this.newsCommentRepository.remove(newsComment);
   }
 
-  
+  async findByNewsId(newsId: number): Promise<NewsComment[]> {
+    return this.newsCommentRepository.find({
+      where: { newsId },
+      relations: ['user', 'news'],
+      order: { createdAt: 'ASC' },
+    });
+  }
 }

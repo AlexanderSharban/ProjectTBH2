@@ -7,25 +7,25 @@ import { UpdateNewsLikeDto } from './dto/update-news-like.dto';
 
 @Injectable()
 export class NewsLikeService {
-  private newsLikes: NewsLike[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(NewsLike)
+    private newsLikeRepository: Repository<NewsLike>,
+  ) {}
 
   async create(createNewsLikeDto: CreateNewsLikeDto): Promise<NewsLike> {
-    const newsLike: NewsLike = {
-      id: this.idCounter++,
-      ...createNewsLikeDto,
-      news: { id: createNewsLikeDto.newsId } as any,
-    } as any;
-    this.newsLikes.push(newsLike);
-    return newsLike;
+    const newsLike = this.newsLikeRepository.create(createNewsLikeDto);
+    return this.newsLikeRepository.save(newsLike);
   }
 
   async findAll(): Promise<NewsLike[]> {
-    return this.newsLikes;
+    return this.newsLikeRepository.find({ relations: ['user', 'news'] });
   }
 
   async findOne(id: number): Promise<NewsLike> {
-    const newsLike = this.newsLikes.find(f => f.id === id);
+    const newsLike = await this.newsLikeRepository.findOne({
+      where: { id },
+      relations: ['user', 'news'],
+    });
     if (!newsLike) {
       throw new NotFoundException(`NewsLike with ID ${id} not found`);
     }
@@ -35,16 +35,24 @@ export class NewsLikeService {
   async update(id: number, updateNewsLikeDto: UpdateNewsLikeDto): Promise<NewsLike> {
     const newsLike = await this.findOne(id);
     Object.assign(newsLike, updateNewsLikeDto);
-    return newsLike;
+    return this.newsLikeRepository.save(newsLike);
   }
 
   async remove(id: number): Promise<void> {
-    const index = this.newsLikes.findIndex(f => f.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`NewsLike with ID ${id} not found`);
-    }
-    this.newsLikes.splice(index, 1);
+    const newsLike = await this.findOne(id);
+    await this.newsLikeRepository.remove(newsLike);
   }
 
-  
+  async findByNewsId(newsId: number): Promise<NewsLike[]> {
+    return this.newsLikeRepository.find({
+      where: { newsId },
+      relations: ['user', 'news'],
+    });
+  }
+
+  async findByUserAndNews(userId: number, newsId: number): Promise<NewsLike | null> {
+    return this.newsLikeRepository.findOne({
+      where: { userId, newsId },
+    });
+  }
 }

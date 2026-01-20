@@ -1,29 +1,28 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { GameComment } from './entities/game-comment.entity';
 import { CreateGameCommentDto } from './dto/create-game-comment.dto';
 import { UpdateGameCommentDto } from './dto/update-game-comment.dto';
 
 @Injectable()
 export class GameCommentService {
-  private gameComments: GameComment[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(GameComment)
+    private gameCommentRepository: Repository<GameComment>,
+  ) {}
 
   async create(createGameCommentDto: CreateGameCommentDto): Promise<GameComment> {
-    const gameComment: GameComment = {
-      id: this.idCounter++,
-      ...createGameCommentDto,
-      game: { id: createGameCommentDto.gameId } as any,
-    } as any;
-    this.gameComments.push(gameComment);
-    return gameComment;
+    const gameComment = this.gameCommentRepository.create(createGameCommentDto);
+    return this.gameCommentRepository.save(gameComment);
   }
 
   async findAll(): Promise<GameComment[]> {
-    return this.gameComments;
+    return this.gameCommentRepository.find({ relations: ['user', 'game'] });
   }
 
   async findOne(id: number): Promise<GameComment> {
-    const gameComment = this.gameComments.find(f => f.id === id);
+    const gameComment = await this.gameCommentRepository.findOne({ where: { id }, relations: ['user', 'game'] });
     if (!gameComment) {
       throw new NotFoundException(`GameComment with ID ${id} not found`);
     }
@@ -31,20 +30,18 @@ export class GameCommentService {
   }
 
   async update(id: number, updateGameCommentDto: UpdateGameCommentDto): Promise<GameComment> {
-    const gameComment = await this.findOne(id);
-    Object.assign(gameComment, updateGameCommentDto);
-    return gameComment;
+    await this.gameCommentRepository.update(id, updateGameCommentDto);
+    return this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {
-    const index = this.gameComments.findIndex(f => f.id === id);
-    if (index === -1) {
+    const result = await this.gameCommentRepository.delete(id);
+    if (result.affected === 0) {
       throw new NotFoundException(`GameComment with ID ${id} not found`);
     }
-    this.gameComments.splice(index, 1);
   }
 
   async findByGameId(gameId: number): Promise<GameComment[]> {
-    return this.gameComments.filter(f => f.gameId === gameId);
+    return this.gameCommentRepository.find({ where: { gameId }, relations: ['user'] });
   }
 }

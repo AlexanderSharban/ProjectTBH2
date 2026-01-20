@@ -22,6 +22,11 @@ export class ProjectLikeController {
     return this.service.findAll();
   }
 
+  @Get('project/:projectId')
+  findByProjectId(@Param('projectId', ParseIntPipe) projectId: number): Promise<ProjectLike[]> {
+    return this.service.findByProjectId(projectId);
+  }
+
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): Promise<ProjectLike> {
     return this.service.findOne(id);

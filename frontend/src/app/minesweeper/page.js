@@ -13,7 +13,7 @@ export default function Minesweeper() {
     if (isGameOver && score > 0) {
       submitScore();
     }
-  }, [isGameOver]);
+  }, [isGameOver, score]);
 
   const submitScore = async () => {
     try {
@@ -38,7 +38,7 @@ export default function Minesweeper() {
     let bombsArray = Array(bombAmount).fill("bomb");
     let emptyArray = Array(width * width - bombAmount).fill("empty");
     let gameArray = [...bombsArray, ...emptyArray];
-
+    
     if (firstClickIndex !== null) {
       gameArray = gameArray.filter((_, index) => index !== firstClickIndex);
       gameArray.sort(() => Math.random() - 0.5);
@@ -47,98 +47,110 @@ export default function Minesweeper() {
       gameArray.sort(() => Math.random() - 0.5);
     }
 
-    const squares = gameArray.map((type, index) => ({
-      id: index,
-      type,
-      revealed: false,
-      flagged: false,
-      neighborCount: 0
-    }));
-
-    // Calculate neighbor counts
-    for (let i = 0; i < squares.length; i++) {
-      if (squares[i].type === "empty") {
-        let count = 0;
-        const isLeftEdge = i % width === 0;
-        const isRightEdge = i % width === width - 1;
-
-        if (squares[i - 1] && !isLeftEdge && squares[i - 1].type === "bomb") count++;
-        if (squares[i + 1] && !isRightEdge && squares[i + 1].type === "bomb") count++;
-        if (squares[i - width - 1] && !isLeftEdge && squares[i - width - 1].type === "bomb") count++;
-        if (squares[i - width] && squares[i - width].type === "bomb") count++;
-        if (squares[i - width + 1] && !isRightEdge && squares[i - width + 1].type === "bomb") count++;
-        if (squares[i + width - 1] && !isLeftEdge && squares[i + width - 1].type === "bomb") count++;
-        if (squares[i + width] && squares[i + width].type === "bomb") count++;
-        if (squares[i + width + 1] && !isRightEdge && squares[i + width + 1].type === "bomb") count++;
-
-        squares[i].neighborCount = count;
-      }
+    let board = [];
+    for (let i = 0; i < width * width; i++) {
+      board.push({ 
+        id: i, 
+        type: gameArray[i], 
+        revealed: false, 
+        flagged: false,
+        adjacent: 0
+      });
     }
 
-    setSquares(squares);
+    for (let i = 0; i < board.length; i++) {
+      if (board[i].type === "bomb") continue;
+      
+      let total = 0;
+      const neighbors = [
+        i - 1, i + 1,
+        i - width, i + width,
+        i - width - 1, i - width + 1,
+        i + width - 1, i + width + 1
+      ];
+      
+      neighbors.forEach(pos => {
+        if (pos >= 0 && pos < width * width && 
+            board[pos]?.type === "bomb" &&
+            Math.abs(pos % width - i % width) <= 1) {
+          total++;
+        }
+      });
+
+      board[i].adjacent = total;
+    }
+
+    setSquares(board);
   }
 
-  function revealSquare(index) {
-    if (isGameOver || squares[index].flagged) return;
-
+  function click(index) {
+    if (isGameOver || squares[index]?.flagged) return;
+    
     if (!gameStarted) {
       setGameStarted(true);
       createBoard(index);
-      // Need to get the updated squares after createBoard
-      setTimeout(() => {
-        const newSquares = [...squares];
-        newSquares[index].revealed = true;
-        setSquares(newSquares);
-        checkForWin(newSquares);
-      }, 0);
       return;
     }
 
     const newSquares = [...squares];
-    newSquares[index].revealed = true;
+    const square = newSquares[index];
+    
+    if (square.revealed) return;
+    
+    square.revealed = true;
 
-    if (newSquares[index].type === "bomb") {
+    if (square.type === "bomb") {
       gameOver();
-      return;
-    }
-
-    if (newSquares[index].neighborCount === 0) {
-      // Reveal adjacent squares
-      const isLeftEdge = index % width === 0;
-      const isRightEdge = index % width === width - 1;
-
-      setTimeout(() => {
-        if (index > 0 && !isLeftEdge && !newSquares[index - 1].revealed) revealSquare(index - 1);
-        if (index < width * width - 1 && !isRightEdge && !newSquares[index + 1].revealed) revealSquare(index + 1);
-        if (index > width && !newSquares[index - width].revealed) revealSquare(index - width);
-        if (index > width - 1 && !isRightEdge && !newSquares[index - width + 1].revealed) revealSquare(index - width + 1);
-        if (index < width * width - width && !isLeftEdge && !newSquares[index + width - 1].revealed) revealSquare(index + width - 1);
-        if (index < width * width - width && !newSquares[index + width].revealed) revealSquare(index + width);
-        if (index < width * width - width - 1 && !isRightEdge && !newSquares[index + width + 1].revealed) revealSquare(index + width + 1);
-      }, 10);
+    } else if (square.adjacent === 0) {
+      revealAdjacent(index, newSquares);
     }
 
     setSquares(newSquares);
-    checkForWin(newSquares);
+    checkWinCondition(newSquares);
+  }
+
+  function revealAdjacent(index, newSquares) {
+    const neighbors = [
+      index - 1, index + 1,
+      index - width, index + width,
+      index - width - 1, index - width + 1,
+      index + width - 1, index + width + 1
+    ];
+
+    neighbors.forEach(pos => {
+      if (pos >= 0 && pos < width * width && 
+          !newSquares[pos]?.revealed && 
+          !newSquares[pos]?.flagged &&
+          Math.abs(pos % width - index % width) <= 1) {
+        
+        newSquares[pos].revealed = true;
+        
+        if (newSquares[pos].adjacent === 0) {
+          revealAdjacent(pos, newSquares);
+        }
+      }
+    });
   }
 
   function addFlag(index, e) {
     e.preventDefault();
-    if (isGameOver || squares[index].revealed) return;
+    if (isGameOver || !gameStarted) return;
 
     const newSquares = [...squares];
     newSquares[index].flagged = !newSquares[index].flagged;
     setSquares(newSquares);
+    checkWinCondition(newSquares);
   }
 
-  function checkForWin(squares) {
-    const revealedSquares = squares.filter(square => square.revealed && square.type !== "bomb");
-    const totalEmptySquares = squares.filter(square => square.type === "empty");
-
-    if (revealedSquares.length === totalEmptySquares.length) {
-      setScore(prev => prev + 1000); // Bonus for winning
+  function checkWinCondition(board) {
+    const allNonBombsRevealed = board.every(square => 
+      square.type === "bomb" || square.revealed
+    );
+    
+    if (allNonBombsRevealed) {
       setIsGameOver(true);
-      alert("Поздравляем! Вы выиграли!");
+      setScore(100); // Fixed score for win
+      alert("Поздравляем! Вы победили!");
     }
   }
 
@@ -147,7 +159,7 @@ export default function Minesweeper() {
       ...square,
       revealed: square.type === "bomb" ? true : square.revealed
     }));
-
+    
     setSquares(newSquares);
     setIsGameOver(true);
     alert("Игра окончена! Вы наступили на мину!");
@@ -163,17 +175,12 @@ export default function Minesweeper() {
 
   function renderSquare(square, index) {
     let content = "";
-    let backgroundColor = square.revealed
-      ? square.type === "bomb"
-        ? "#FF0000"
-        : "#172A45"
-      : "#0A192F";
-
+    
     if (square.revealed) {
       if (square.type === "bomb") {
         content = "💣";
-      } else if (square.neighborCount > 0) {
-        content = square.neighborCount;
+      } else if (square.adjacent > 0) {
+        content = square.adjacent;
       }
     } else if (square.flagged) {
       content = "🚩";
@@ -185,17 +192,23 @@ export default function Minesweeper() {
         style={{
           width: "30px",
           height: "30px",
-          backgroundColor,
-          border: "1px solid #00FFAA",
+          backgroundColor: square.revealed 
+            ? square.type === "bomb" 
+              ? "#FF0000" 
+              : "#172A45"
+            : "#0A192F",
           display: "flex",
           justifyContent: "center",
           alignItems: "center",
           cursor: "pointer",
-          fontSize: "16px",
+          fontSize: "14px",
           fontWeight: "bold",
-          color: "#00FFAA"
+          color: square.revealed && square.adjacent > 0 ? "#00FFAA" : "#FFFFFF",
+          border: `1px solid ${square.revealed ? "#00FFAA" : "#0A192F"}`,
+          userSelect: "none",
+          transition: "background-color 0.2s ease"
         }}
-        onClick={() => revealSquare(index)}
+        onClick={() => click(index)}
         onContextMenu={(e) => addFlag(index, e)}
       >
         {content}
@@ -218,7 +231,7 @@ export default function Minesweeper() {
       padding: "20px",
       color: "#FFFFFF"
     }}>
-      <h1 style={{
+      <h1 style={{ 
         color: "#00FFAA",
         marginBottom: "20px",
         textAlign: "center",
@@ -226,8 +239,8 @@ export default function Minesweeper() {
       }}>
         Сапёр
       </h1>
-
-      <div style={{
+      
+      <div style={{ 
         display: "grid",
         gridTemplateColumns: `repeat(${width}, 30px)`,
         gridTemplateRows: `repeat(${width}, 30px)`,
@@ -240,16 +253,16 @@ export default function Minesweeper() {
       }}>
         {squares.map((square, index) => renderSquare(square, index))}
       </div>
-
-      <div style={{
-        marginBottom: "20px",
+      
+      <div style={{ 
+        marginBottom: "20px", 
         textAlign: "center",
         color: "#00FFAA"
       }}>
         <p>Левый клик - открыть клетку</p>
         <p>Правый клик - поставить флажок</p>
       </div>
-
+      
       {isGameOver && (
         <button
           onClick={resetGame}
@@ -264,13 +277,15 @@ export default function Minesweeper() {
             fontWeight: "bold",
             transition: "all 0.3s ease"
           }}
+          onMouseOver={(e) => e.target.style.backgroundColor = '#00FFAA'}
+          onMouseOut={(e) => e.target.style.backgroundColor = '#0A192F'}
         >
           Новая игра
         </button>
       )}
-
+      
       {!gameStarted && !isGameOver && (
-        <div style={{
+        <div style={{ 
           backgroundColor: "rgba(10, 25, 47, 0.7)",
           padding: "10px",
           borderRadius: "5px",

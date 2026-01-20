@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import Image from 'next/image';
+import { Link, useParams } from 'react-router-dom';
 
 // Данные проекта (можно вынести в отдельный файл)
 const projectsData = {
@@ -23,49 +22,50 @@ const projectsData = {
   }
 };
 
-// Динамическая генерация метаданных
-export async function generateMetadata({ params }) {
-  const project = projectsData[params.slug];
-  return {
-    title: project?.title || 'Проект',
-    description: project?.description || 'Описание проекта',
-  };
-}
-
-export default function ProjectPage({ params }) {
-  const project = projectsData[params.slug];
+export default function ProjectPage() {
+  const { slug } = useParams();
+  const project = projectsData[slug];
 
   if (!project) {
-    return <div className="max-w-6xl mx-auto px-4 py-16 text-[#00FFAA] text-center">Проект не найден</div>;
+    return <div style={{ maxWidth: '1536px', margin: '0 auto', padding: '16px', paddingTop: '64px', color: '#00FFAA', textAlign: 'center' }}>Проект не найден</div>;
   }
 
   return (
-    <div className="max-w-6xl w-full mx-auto px-4 py-16 text-[#00FFAA] flex flex-col items-center">
-      <h1 className="text-4xl font-bold mb-6 text-[#00FFAA] text-center">{project.title}</h1>
-      <p className="text-2xl mb-8 text-[#00FFCC] text-center">{project.description}</p>
+    <div style={{ maxWidth: '1536px', width: '100%', margin: '0 auto', padding: '16px', paddingTop: '64px', color: '#00FFAA', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <h1 style={{ fontSize: '2.25rem', fontWeight: 'bold', marginBottom: '24px', color: '#00FFAA', textAlign: 'center' }}>{project.title}</h1>
+      <p style={{ fontSize: '1.5rem', marginBottom: '32px', color: '#00FFCC', textAlign: 'center' }}>{project.description}</p>
 
       {/* Галерея проекта */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12 w-full">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginBottom: '48px', width: '100%' }}>
         {project.images.map((img, index) => (
-          <div key={index} className="relative aspect-video border-2 border-[#00FFAA] rounded-lg overflow-hidden">
-            <Image
+          <div key={index} style={{ position: 'relative', aspectRatio: '16/9', border: '2px solid #00FFAA', borderRadius: '8px', overflow: 'hidden' }}>
+            <img
               src={img}
               alt={`${project.title} - ${index + 1}`}
-              fill
-              className="object-cover"
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           </div>
         ))}
       </div>
 
       {/* Описание проекта */}
-      <div className="prose prose-invert max-w-none mb-12 text-[#00FFAA] text-center">
-        <p className="text-lg">{project.details}</p>
+      <div style={{ maxWidth: 'none', marginBottom: '48px', color: '#00FFAA', textAlign: 'center' }}>
+        <p style={{ fontSize: '1.125rem' }}>{project.details}</p>
       </div>
 
       <Link
-        href="/projects"
-        className="px-6 py-3 bg-[#00FFAA] text-black font-bold rounded-lg hover:bg-[#00FFCC] transition-colors"
+        to="/projects"
+        style={{
+          padding: '12px 24px',
+          backgroundColor: '#00FFAA',
+          color: 'black',
+          fontWeight: 'bold',
+          borderRadius: '8px',
+          textDecoration: 'none',
+          transition: 'background-color 0.3s'
+        }}
+        onMouseOver={(e) => e.target.style.backgroundColor = '#00FFCC'}
+        onMouseOut={(e) => e.target.style.backgroundColor = '#00FFAA'}
       >
         НАЗАД К ПРОЕКТАМ
       </Link>

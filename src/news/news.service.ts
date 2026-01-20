@@ -7,27 +7,25 @@ import { UpdateNewsDto } from './dto/update-news.dto';
 
 @Injectable()
 export class NewsService {
-  private news: News[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(News)
+    private newsRepository: Repository<News>,
+  ) {}
 
   async create(createNewsDto: CreateNewsDto): Promise<News> {
-    const news: News = {
-      id: this.idCounter++,
-      ...createNewsDto,
-      creatorId: createNewsDto.creatorId,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    } as any;
-    this.news.push(news);
-    return news;
+    const news = this.newsRepository.create(createNewsDto);
+    return this.newsRepository.save(news);
   }
 
   async findAll(): Promise<News[]> {
-    return this.news;
+    return this.newsRepository.find({ relations: ['creator'], order: { createdAt: 'DESC' } });
   }
 
   async findOne(id: number): Promise<News> {
-    const news = this.news.find(f => f.id === id);
+    const news = await this.newsRepository.findOne({
+      where: { id },
+      relations: ['creator'],
+    });
     if (!news) {
       throw new NotFoundException(`News with ID ${id} not found`);
     }
@@ -36,17 +34,12 @@ export class NewsService {
 
   async update(id: number, updateNewsDto: UpdateNewsDto): Promise<News> {
     const news = await this.findOne(id);
-    Object.assign(news, updateNewsDto);
-    return news;
+    Object.assign(news, updateNewsDto, { updatedAt: new Date() });
+    return this.newsRepository.save(news);
   }
 
   async remove(id: number): Promise<void> {
-    const index = this.news.findIndex(f => f.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`News with ID ${id} not found`);
-    }
-    this.news.splice(index, 1);
+    const news = await this.findOne(id);
+    await this.newsRepository.remove(news);
   }
-
-  
 }

@@ -23,6 +23,13 @@ export class ProjectCommentController {
   findAll(): Promise<ProjectComment[]> {
     return this.projectCommentService.findAll();
   }
+
+  @Get('project/:projectId')
+  @ApiOperation({ summary: 'Get comments by project ID' })
+  @ApiParam({ name: 'projectId', type: 'number' })
+  findByProjectId(@Param('projectId', ParseIntPipe) projectId: number): Promise<ProjectComment[]> {
+    return this.projectCommentService.findByProjectId(projectId);
+  }
   
 
   @Get(':id')

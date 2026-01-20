@@ -7,31 +7,25 @@ import { UpdateCreatorDto } from './dto/update-creator.dto';
 
 @Injectable()
 export class CreatorService {
-  private creators: Creator[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(Creator)
+    private creatorRepository: Repository<Creator>,
+  ) {}
 
   async create(createCreatorDto: CreateCreatorDto): Promise<Creator> {
-    const creator: Creator = {
-      id: this.idCounter++,
-      ...createCreatorDto,
-      userId: createCreatorDto.userId,
-      name: createCreatorDto.name,
-      bio: createCreatorDto.bio,
-      avatarUrl: createCreatorDto.avatarUrl,
-      likesCount: 0,
-      commentsCount: 0,
-      createdAt: new Date(),
-    } as any;
-    this.creators.push(creator);
-    return creator;
+    const creator = this.creatorRepository.create(createCreatorDto);
+    return this.creatorRepository.save(creator);
   }
 
   async findAll(): Promise<Creator[]> {
-    return this.creators;
+    return this.creatorRepository.find({ relations: ['user'] });
   }
 
   async findOne(id: number): Promise<Creator> {
-    const creator = this.creators.find(c => c.id === id);
+    const creator = await this.creatorRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
     if (!creator) {
       throw new NotFoundException(`Creator with ID ${id} not found`);
     }
@@ -41,16 +35,18 @@ export class CreatorService {
   async update(id: number, updateCreatorDto: UpdateCreatorDto): Promise<Creator> {
     const creator = await this.findOne(id);
     Object.assign(creator, updateCreatorDto);
-    return creator;
+    return this.creatorRepository.save(creator);
   }
 
   async remove(id: number): Promise<void> {
-    const index = this.creators.findIndex(c => c.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`Creator with ID ${id} not found`);
-    }
-    this.creators.splice(index, 1);
+    const creator = await this.findOne(id);
+    await this.creatorRepository.remove(creator);
   }
 
-  
+  async findByUserId(userId: number): Promise<Creator | null> {
+    return this.creatorRepository.findOne({
+      where: { userId },
+      relations: ['user'],
+    });
+  }
 }

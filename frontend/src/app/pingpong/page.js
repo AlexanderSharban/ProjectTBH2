@@ -11,7 +11,6 @@ const BALL_SIZE = 15;
 const PADDLE_MARGIN = 30;
 const BALL_SPEED = 4;
 const PADDLE_SPEED = 5;
-const PADDLE_ACCELERATION = 0.2;
 
 export default function PongGame() {
   const [player1Y, setPlayer1Y] = useState(GAME_HEIGHT / 2 - PADDLE_HEIGHT / 2);

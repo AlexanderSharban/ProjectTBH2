@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 export default function Home() {
-  const [opened, setOpened] = useState([false, false, false, false, false]);
+  const [opened, setOpened] = useState([true, true, true, true, true]);
 
   const gameLinks = [
     '/minesweeper',

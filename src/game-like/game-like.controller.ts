@@ -24,13 +24,11 @@ export class GameLikeController {
     return this.gameLikeService.findAll();
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get game like by ID' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Game like ID' })
-  @ApiResponse({ status: 200, description: 'Game like found', type: GameLike })
-  @ApiResponse({ status: 404, description: 'Game like not found' })
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<GameLike> {
-    return this.gameLikeService.findOne(id);
+  @Get('game/:gameId')
+  @ApiOperation({ summary: 'Get likes by game ID' })
+  @ApiParam({ name: 'gameId', type: 'number' })
+  findByGameId(@Param('gameId', ParseIntPipe) gameId: number): Promise<GameLike[]> {
+    return this.gameLikeService.findByGameId(gameId);
   }
 
   @Patch(':id')

@@ -1,45 +1,58 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { ProjectLike } from './entities/project-like.entity';
 import { CreateProjectLikeDto } from './dto/create-project-like.dto';
 import { UpdateProjectLikeDto } from './dto/update-project-like.dto';
 
 @Injectable()
 export class ProjectLikeService {
-  private items: ProjectLike[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(ProjectLike)
+    private projectLikeRepository: Repository<ProjectLike>,
+  ) {}
 
-  async create(dto: CreateProjectLikeDto): Promise<ProjectLike> {
-    const rec: ProjectLike = {
-      id: this.idCounter++,
-      userId: dto.userId,
-      projectId: dto.projectId,
-      createdAt: new Date(),
-      user: { id: dto.userId } as any,
-      project: { id: dto.projectId } as any,
-    } as any;
-    this.items.push(rec);
-    return rec;
+  async create(createProjectLikeDto: CreateProjectLikeDto): Promise<ProjectLike> {
+    const projectLike = this.projectLikeRepository.create(createProjectLikeDto);
+    return this.projectLikeRepository.save(projectLike);
   }
 
   async findAll(): Promise<ProjectLike[]> {
-    return this.items;
+    return this.projectLikeRepository.find({ relations: ['user', 'project'] });
   }
 
   async findOne(id: number): Promise<ProjectLike> {
-    const r = this.items.find(i => i.id === id);
-    if (!r) throw new NotFoundException(`ProjectLike with ID ${id} not found`);
-    return r;
+    const projectLike = await this.projectLikeRepository.findOne({
+      where: { id },
+      relations: ['user', 'project'],
+    });
+    if (!projectLike) {
+      throw new NotFoundException(`ProjectLike with ID ${id} not found`);
+    }
+    return projectLike;
   }
 
-  async update(id: number, dto: UpdateProjectLikeDto): Promise<ProjectLike> {
-    const r = await this.findOne(id);
-    Object.assign(r, dto);
-    return r;
+  async update(id: number, updateProjectLikeDto: UpdateProjectLikeDto): Promise<ProjectLike> {
+    const projectLike = await this.findOne(id);
+    Object.assign(projectLike, updateProjectLikeDto);
+    return this.projectLikeRepository.save(projectLike);
   }
 
   async remove(id: number): Promise<void> {
-    const idx = this.items.findIndex(i => i.id === id);
-    if (idx === -1) throw new NotFoundException(`ProjectLike with ID ${id} not found`);
-    this.items.splice(idx, 1);
+    const projectLike = await this.findOne(id);
+    await this.projectLikeRepository.remove(projectLike);
+  }
+
+  async findByProjectId(projectId: number): Promise<ProjectLike[]> {
+    return this.projectLikeRepository.find({
+      where: { projectId },
+      relations: ['user', 'project'],
+    });
+  }
+
+  async findByUserAndProject(userId: number, projectId: number): Promise<ProjectLike | null> {
+    return this.projectLikeRepository.findOne({
+      where: { userId, projectId },
+    });
   }
 }

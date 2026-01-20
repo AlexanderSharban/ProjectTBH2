@@ -24,13 +24,11 @@ export class GameCommentController {
     return this.gameCommentService.findAll();
   }
 
-  @Get(':id')
-  @ApiOperation({ summary: 'Get game comment by ID' })
-  @ApiParam({ name: 'id', type: 'number', description: 'Game comment ID' })
-  @ApiResponse({ status: 200, description: 'Game comment found', type: GameComment })
-  @ApiResponse({ status: 404, description: 'Game comment not found' })
-  findOne(@Param('id', ParseIntPipe) id: number): Promise<GameComment> {
-    return this.gameCommentService.findOne(id);
+  @Get('game/:gameId')
+  @ApiOperation({ summary: 'Get comments by game ID' })
+  @ApiParam({ name: 'gameId', type: 'number' })
+  findByGameId(@Param('gameId', ParseIntPipe) gameId: number): Promise<GameComment[]> {
+    return this.gameCommentService.findByGameId(gameId);
   }
 
   @Patch(':id')

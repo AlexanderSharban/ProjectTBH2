@@ -13,10 +13,6 @@ const SHAPES = [
   [[0, 1, 1], [1, 1, 0]]  // S
 ];
 
-function createEmptyBoard() {
-  return Array(ROWS).fill().map(() => Array(COLS).fill(0));
-}
-
 export default function TetrisGame() {
   const [board, setBoard] = useState(createEmptyBoard());
   const [currentPiece, setCurrentPiece] = useState(null);
@@ -29,20 +25,19 @@ export default function TetrisGame() {
     if (gameOver && score > 0) {
       submitScore();
     }
-  }, [gameOver]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [gameOver, score]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const submitScore = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
 
-      // Декодируем токен для получения userId (простой способ, без jwt-decode)
       const payload = JSON.parse(atob(token.split('.')[1]));
       const userId = payload.id;
 
       await api.post('/user-game-scores', {
         userId,
-        gameId: 1, // Предположим, Tetris имеет id 1
+        gameId: 1, // Tetris id 1
         score
       });
       console.log('Score submitted:', score);
@@ -50,6 +45,10 @@ export default function TetrisGame() {
       console.error('Error submitting score:', error);
     }
   };
+
+  function createEmptyBoard() {
+    return Array(ROWS).fill().map(() => Array(COLS).fill(0));
+  }
 
   const spawnRandomPiece = useCallback(() => {
     const pieceIndex = Math.floor(Math.random() * SHAPES.length);
@@ -60,29 +59,55 @@ export default function TetrisGame() {
     };
     const startX = Math.floor((COLS - newPiece.width) / 2);
     const startY = -newPiece.height + 1; // Начинаем выше поля
-
+    
     // Проверка на проигрыш (если после спавна фигура сразу сталкивается)
     if (checkCollision(newPiece, {x: startX, y: startY})) {
       setGameOver(true);
       return;
     }
-
+    
     setCurrentPiece(newPiece);
     setCurrentPos({x: startX, y: startY});
   }, []);
 
+  const rotatePiece = () => {
+    if (!currentPiece || gameOver || isPaused) return;
+    
+    const rotated = currentPiece.shape[0].map((_, i) =>
+      currentPiece.shape.map(row => row[i]).reverse()
+    );
+    
+    const newPiece = {
+      shape: rotated,
+      width: rotated[0].length,
+      height: rotated.length
+    };
+    
+    // Корректировка позиции при повороте у границ
+    let newX = currentPos.x;
+    if (currentPos.x + newPiece.width > COLS) {
+      newX = COLS - newPiece.width;
+    }
+    
+    if (!checkCollision(newPiece, {x: newX, y: currentPos.y})) {
+      setCurrentPiece(newPiece);
+      setCurrentPos(pos => ({...pos, x: newX}));
+    }
+  };
+
   const checkCollision = (piece, pos) => {
     for (let y = 0; y < piece.height; y++) {
       for (let x = 0; x < piece.width; x++) {
-        if (piece.shape[y][x]) {
+        if (piece.shape[y][x] !== 0) {
           const newX = pos.x + x;
           const newY = pos.y + y;
-
-          if (newX < 0 || newX >= COLS || newY >= ROWS) {
-            return true;
-          }
-
-          if (newY >= 0 && board[newY][newX]) {
+          
+          if (
+            newX < 0 || 
+            newX >= COLS || 
+            newY >= ROWS ||
+            (newY >= 0 && board[newY][newX])
+          ) {
             return true;
           }
         }
@@ -91,211 +116,299 @@ export default function TetrisGame() {
     return false;
   };
 
-  const placePiece = () => {
-    const newBoard = board.map(row => [...row]);
+  const movePiece = useCallback((direction) => {
+    if (!currentPiece || gameOver || isPaused) return;
+    
+    const newPos = {...currentPos};
+    
+    switch (direction) {
+      case 'left':
+        newPos.x--;
+        break;
+      case 'right':
+        newPos.x++;
+        break;
+      case 'down':
+        newPos.y++;
+        break;
+      default:
+        break;
+    }
+    
+    if (!checkCollision(currentPiece, newPos)) {
+      setCurrentPos(newPos);
+    } else if (direction === 'down') {
+      lockPiece();
+    }
+  }, [currentPiece, currentPos, gameOver, isPaused]);
+
+  const lockPiece = useCallback(() => {
+    if (!currentPiece) return;
+    
+    const newBoard = [...board];
+    let touchedCeiling = false;
+    
     for (let y = 0; y < currentPiece.height; y++) {
       for (let x = 0; x < currentPiece.width; x++) {
         if (currentPiece.shape[y][x]) {
           const boardY = currentPos.y + y;
           const boardX = currentPos.x + x;
-          if (boardY >= 0) {
-            newBoard[boardY][boardX] = 1;
+          
+          if (boardY < 0) {
+            // Фигура касается потолка
+            touchedCeiling = true;
+            continue;
+          }
+          
+          if (boardY < ROWS) {
+            newBoard[boardY][boardX] = 1; // 1 - упавшая зеленая фигура
           }
         }
       }
     }
+    
     setBoard(newBoard);
-    clearLines(newBoard);
-    spawnRandomPiece();
-  };
-
-  const clearLines = (board) => {
-    const newBoard = board.filter(row => row.some(cell => cell === 0));
-    const linesCleared = ROWS - newBoard.length;
-    const emptyRows = Array(linesCleared).fill().map(() => Array(COLS).fill(0));
-    const finalBoard = [...emptyRows, ...newBoard];
-    setBoard(finalBoard);
-    setScore(prev => prev + linesCleared * 100);
-  };
-
-  const movePiece = (dx, dy) => {
-    if (!currentPiece || gameOver || isPaused) return;
-
-    const newPos = {x: currentPos.x + dx, y: currentPos.y + dy};
-
-    if (!checkCollision(currentPiece, newPos)) {
-      setCurrentPos(newPos);
-    } else if (dy > 0) {
-      // Если не можем двигаться вниз, размещаем фигуру
-      placePiece();
-    }
-  };
-
-  const rotatePiece = () => {
-    if (!currentPiece || gameOver || isPaused) return;
-
-    const rotated = currentPiece.shape[0].map((_, i) =>
-      currentPiece.shape.map(row => row[i]).reverse()
-    );
-
-    const newPiece = {
-      shape: rotated,
-      width: rotated[0].length,
-      height: rotated.length
-    };
-
-    // Корректировка позиции при повороте у границ
-    let newX = currentPos.x;
-    if (currentPos.x + newPiece.width > COLS) {
-      newX = COLS - newPiece.width;
-    }
-
-    if (!checkCollision(newPiece, {x: newX, y: currentPos.y})) {
-      setCurrentPiece(newPiece);
-      setCurrentPos(pos => ({...pos, x: newX}));
-    }
-  };
-
-  const dropPiece = () => {
-    if (!currentPiece || gameOver || isPaused) return;
-
-    let newY = currentPos.y;
-    while (!checkCollision(currentPiece, {x: currentPos.x, y: newY + 1})) {
-      newY++;
-    }
-    setCurrentPos(pos => ({...pos, y: newY}));
-    placePiece();
-  };
-
-  const resetGame = () => {
-    setBoard(createEmptyBoard());
     setCurrentPiece(null);
-    setCurrentPos({x: 0, y: 0});
+    
+    if (touchedCeiling) {
+      setGameOver(true);
+    } else {
+      checkLines();
+      spawnRandomPiece();
+    }
+  }, [board, currentPiece, currentPos, spawnRandomPiece]);
+
+  const checkLines = () => {
+    const newBoard = [...board];
+    let linesCleared = 0;
+    
+    for (let y = ROWS - 1; y >= 0; y--) {
+      if (newBoard[y].every(cell => cell)) {
+        newBoard.splice(y, 1);
+        newBoard.unshift(Array(COLS).fill(0));
+        linesCleared++;
+        y++; // Проверяем ту же позицию снова
+      }
+    }
+    
+    if (linesCleared > 0) {
+      setBoard(newBoard);
+      setScore(prev => prev + linesCleared * 100);
+    }
+  };
+
+  const handleKeyDown = useCallback((e) => {
+    if (gameOver) {
+      if (e.key === ' ') {
+        resetGame();
+      }
+      return;
+    }
+    
+    if (e.key === 'p') {
+      setIsPaused(prev => !prev);
+      return;
+    }
+    
+    if (isPaused) return;
+    
+    switch (e.key) {
+      case 'ArrowLeft':
+        movePiece('left');
+        break;
+      case 'ArrowRight':
+        movePiece('right');
+        break;
+      case 'ArrowDown':
+        movePiece('down');
+        break;
+      case 'ArrowUp':
+        rotatePiece();
+        break;
+      default:
+        break;
+    }
+  }, [gameOver, isPaused, movePiece]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+
+  // Автоматическое падение
+  useEffect(() => {
+    if (gameOver || isPaused || !currentPiece) return;
+    
+    const interval = setInterval(() => {
+      movePiece('down');
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [currentPiece, gameOver, isPaused, movePiece]);
+
+  // Инициализация игры
+  useEffect(() => {
+    const newBoard = createEmptyBoard();
+    setBoard(newBoard);
+    setCurrentPiece(null);
     setGameOver(false);
     setScore(0);
     setIsPaused(false);
-    spawnRandomPiece();
-  };
-
-  useEffect(() => {
-    const handleKeyPress = (e) => {
-      switch (e.key) {
-        case 'ArrowLeft':
-          movePiece(-1, 0);
-          break;
-        case 'ArrowRight':
-          movePiece(1, 0);
-          break;
-        case 'ArrowDown':
-          movePiece(0, 1);
-          break;
-        case 'ArrowUp':
-          rotatePiece();
-          break;
-        case ' ':
-          e.preventDefault();
-          dropPiece();
-          break;
-        case 'p':
-        case 'P':
-          setIsPaused(prev => !prev);
-          break;
-        default:
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [currentPiece, currentPos, gameOver, isPaused]);
-
-  useEffect(() => {
-    if (!currentPiece && !gameOver) {
+    
+    // Небольшая задержка перед спавном первой фигуры
+    const timer = setTimeout(() => {
       spawnRandomPiece();
-    }
-  }, [currentPiece, gameOver, spawnRandomPiece]);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
-  useEffect(() => {
-    if (!gameOver && !isPaused && currentPiece) {
-      const interval = setInterval(() => {
-        movePiece(0, 1);
-      }, 500);
-      return () => clearInterval(interval);
-    }
-  }, [currentPiece, currentPos, gameOver, isPaused]);
+  const resetGame = () => {
+    const newBoard = createEmptyBoard();
+    setBoard(newBoard);
+    setCurrentPiece(null);
+    setGameOver(false);
+    setScore(0);
+    setIsPaused(false);
+    
+    // Небольшая задержка перед спавном первой фигуры
+    setTimeout(() => {
+      spawnRandomPiece();
+    }, 100);
+  };
 
   const renderBoard = () => {
     const displayBoard = board.map(row => [...row]);
-
+    
     if (currentPiece) {
       for (let y = 0; y < currentPiece.height; y++) {
         for (let x = 0; x < currentPiece.width; x++) {
           if (currentPiece.shape[y][x]) {
             const boardY = currentPos.y + y;
             const boardX = currentPos.x + x;
+            
             if (boardY >= 0 && boardY < ROWS && boardX >= 0 && boardX < COLS) {
-              displayBoard[boardY][boardX] = 2; // Текущая фигура
+              displayBoard[boardY][boardX] = 2; // 2 - текущая фигура
             }
           }
         }
       }
     }
-
-    return displayBoard.map((row, y) => (
-      <div key={y} className="flex">
-        {row.map((cell, x) => (
-          <div
-            key={x}
-            className={`w-6 h-6 border border-gray-600 ${
-              cell === 1 ? 'bg-[#00FFAA]' : cell === 2 ? 'bg-[#00FFCC]' : 'bg-gray-900'
-            }`}
-          />
-        ))}
+    
+    return (
+      
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: `repeat(${COLS}, 30px)`,
+        gridTemplateRows: `repeat(${ROWS}, 30px)`,
+        gap: '2px',
+        backgroundColor: '#00FFAA',
+        padding: '5px',
+        border: '3px solid #00FFAA',
+        marginBottom: '20px'
+      }}>
+        {displayBoard.map((row, y) => 
+          row.map((cell, x) => (
+            <div
+              key={`${y}-${x}`}
+              style={{
+                width: '30px',
+                height: '30px',
+                backgroundColor: cell === 0 ? '#0A192F' : cell === 1 ? '#00FFAA' : '#00FFAA',
+                border: `1px solid ${cell === 0 ? '#0A192F' : '#00FFAA'}`,
+                opacity: cell === 2 ? 0.8 : 1
+              }}
+            />
+          ))
+        )}
       </div>
-    ));
+    );
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#0A192F] text-[#00FFAA] p-4">
-      <h1 className="text-4xl font-bold mb-8">TETRIS</h1>
-
-      <div className="flex gap-8">
-        <div className="flex flex-col items-center">
-          <div className="border-2 border-[#00FFAA] p-2 bg-black">
-            {renderBoard()}
-          </div>
-
-          <div className="mt-4 text-center">
-            <p className="text-xl">Score: {score}</p>
-            {gameOver && <p className="text-red-500 mt-2">Game Over!</p>}
-            {isPaused && <p className="text-yellow-500 mt-2">Paused</p>}
-          </div>
-
-          <div className="mt-4 flex gap-2">
-            <button
-              onClick={resetGame}
-              className="px-4 py-2 bg-[#00FFAA] text-black font-bold rounded hover:bg-[#00FFCC]"
-            >
-              New Game
-            </button>
-            <button
-              onClick={() => setIsPaused(!isPaused)}
-              className="px-4 py-2 bg-[#00FFAA] text-black font-bold rounded hover:bg-[#00FFCC]"
-            >
-              {isPaused ? 'Resume' : 'Pause'}
-            </button>
-          </div>
-        </div>
-
-        <div className="text-sm max-w-xs">
-          <h3 className="text-lg font-bold mb-2">Controls:</h3>
-          <p>← → : Move</p>
-          <p>↓ : Soft Drop</p>
-          <p>↑ : Rotate</p>
-          <p>Space : Hard Drop</p>
-          <p>P : Pause</p>
-        </div>
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      minHeight: '100vh',
+      backgroundColor: '#0A192F',
+      padding: '20px',
+      color: '#00FFAA'
+    }}>
+      <h1 style={{ 
+        color: '#00FFAA',
+        marginBottom: '20px',
+        textAlign: 'center',
+        textShadow: '0 0 5px #00FFAA'
+      }}>
+        Тетрис
+      </h1>
+      
+      <div style={{ 
+        fontSize: '20px',
+        fontWeight: 'bold',
+        marginBottom: '10px'
+      }}>
+        Счет: {score}
       </div>
+      
+      {isPaused && !gameOver && (
+        <div style={{
+          position: 'absolute',
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          padding: '20px',
+          borderRadius: '10px',
+          zIndex: 100,
+          color: '#00FFAA',
+          fontSize: '24px',
+          fontWeight: 'bold'
+        }}>
+          ПАУЗА
+        </div>
+      )}
+      
+      {renderBoard()}
+      
+      <div style={{ 
+        marginBottom: '20px', 
+        textAlign: 'center'
+      }}>
+        <p>Управление: ← → ↓, ↑ - поворот</p>
+        <p>P - пауза, Пробел - новая игра</p>
+      </div>
+      
+      {gameOver && (
+        <div style={{ 
+          backgroundColor: 'rgba(255, 0, 0, 0.3)',
+          padding: '20px',
+          borderRadius: '10px',
+          marginBottom: '20px',
+          textAlign: 'center',
+          border: '2px solid #FF0000'
+        }}>
+          <h2 style={{ color: '#FF0000', marginBottom: '10px' }}>Игра окончена!</h2>
+          <p style={{ marginBottom: '15px' }}>Фигура коснулась потолка</p>
+          <button
+            onClick={resetGame}
+            style={{
+              padding: '10px 20px',
+              backgroundColor: '#0A192F',
+              color: '#00FFAA',
+              border: '2px solid #00FFAA',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              fontSize: '16px',
+              fontWeight: 'bold',
+              transition: 'all 0.3s ease'
+            }}
+            onMouseOver={(e) => e.target.style.backgroundColor = '#00FFAA'}
+            onMouseOut={(e) => e.target.style.backgroundColor = '#0A192F'}
+          >
+            Новая игра (Пробел)
+          </button>
+        </div>
+      )}
     </div>
-  );
+  );      
 }

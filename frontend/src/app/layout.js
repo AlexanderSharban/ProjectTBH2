@@ -91,6 +91,11 @@ export default function RootLayout({ children }) {
                 ПРОЕКТЫ
               </span>
             </Link>
+            <Link href="/games">
+              <span className="hover:underline hover:text-[#00FFCC]">
+                ИГРЫ
+              </span>
+            </Link>
             <Link href="/gallery">
               <span className="hover:underline hover:text-[#00FFCC]">
                 ГАЛЕРЕЯ
@@ -99,6 +104,16 @@ export default function RootLayout({ children }) {
             <Link href="/creators">
               <span className="hover:underline hover:text-[#00FFCC]">
                 КРЕАТОРЫ
+              </span>
+            </Link>
+            <Link href="/profile">
+              <span className="hover:underline hover:text-[#00FFCC]">
+                ПРОФИЛЬ
+              </span>
+            </Link>
+            <Link href="/register">
+              <span className="hover:underline hover:text-[#00FFCC]">
+                РЕГИСТРАЦИЯ
               </span>
             </Link>
             <Link href="/contacts">

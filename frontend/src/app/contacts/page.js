@@ -1,6 +1,3 @@
-'use client';
-import Link from 'next/link';
-
 const contacts = [
   {
     name: 'Электронная почта',
@@ -26,22 +23,37 @@ const contacts = [
 
 export default function ContactsPage() {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center p-8 text-[#00FFAA]">
-      <h1 className="text-4xl font-bold mb-12 text-[#00FFAA]">КОНТАКТЫ</h1>
+    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '32px', color: '#00FFAA' }}>
+      <h1 style={{ fontSize: '2.25rem', fontWeight: 'bold', marginBottom: '48px', color: '#00FFAA' }}>КОНТАКТЫ</h1>
 
       {/* Контактные карточки */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mb-16">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '32px', width: '100%', maxWidth: '1024px', marginBottom: '64px' }}>
         {contacts.map((contact, index) => (
           <div
             key={index}
-            className="border-2 border-[#00FFAA] rounded-lg p-6 hover:bg-[#0A192F] transition-colors"
+            style={{
+              border: '2px solid #00FFAA',
+              borderRadius: '8px',
+              padding: '24px',
+              transition: 'background-color 0.3s',
+              cursor: 'pointer'
+            }}
+            onMouseOver={(e) => e.target.style.backgroundColor = '#0A192F'}
+            onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
           >
-            <h3 className="text-xl font-bold mb-2 text-[#00FFAA]">{contact.name}</h3>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '8px', color: '#00FFAA' }}>{contact.name}</h3>
             <a
               href={contact.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-lg text-[#00FFAA] hover:text-[#00FFCC] transition-colors"
+              style={{
+                fontSize: '1.125rem',
+                color: '#00FFAA',
+                textDecoration: 'none',
+                transition: 'color 0.3s'
+              }}
+              onMouseOver={(e) => e.target.style.color = '#00FFCC'}
+              onMouseOut={(e) => e.target.style.color = '#00FFAA'}
             >
               {contact.value}
             </a>

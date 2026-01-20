@@ -8,26 +8,25 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 
 @Injectable()
 export class ProjectService {
-  private projects: Project[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(Project)
+    private projectRepository: Repository<Project>,
+  ) {}
 
   async create(createProjectDto: CreateProjectDto): Promise<Project> {
-    const project: Project = {
-      id: this.idCounter++,
-      ...createProjectDto,
-      creatorId: createProjectDto.creatorId,
-      createdAt: new Date(),
-    } as any;
-    this.projects.push(project);
-    return project;
+    const project = this.projectRepository.create(createProjectDto);
+    return this.projectRepository.save(project);
   }
 
   async findAll(): Promise<Project[]> {
-    return this.projects;
+    return this.projectRepository.find({ relations: ['creator'] });
   }
 
   async findOne(id: number): Promise<Project> {
-    const project = this.projects.find(p => p.id === id);
+    const project = await this.projectRepository.findOne({
+      where: { id },
+      relations: ['creator'],
+    });
     if (!project) {
       throw new NotFoundException(`Project with ID ${id} not found`);
     }
@@ -37,16 +36,11 @@ export class ProjectService {
   async update(id: number, updateProjectDto: UpdateProjectDto): Promise<Project> {
     const project = await this.findOne(id);
     Object.assign(project, updateProjectDto);
-    return project;
+    return this.projectRepository.save(project);
   }
 
   async remove(id: number): Promise<void> {
-    const index = this.projects.findIndex(p => p.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`Project with ID ${id} not found`);
-    }
-    this.projects.splice(index, 1);
+    const project = await this.findOne(id);
+    await this.projectRepository.remove(project);
   }
-
-  
 }

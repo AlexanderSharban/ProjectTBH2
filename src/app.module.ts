@@ -1,12 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { MulterModule } from '@nestjs/platform-express';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
-import { GamesModule } from './game/game.module';
-import { GameCommentModule } from './game-comment/game-comment.module';
-import { GameLikeModule } from './game-like/game-like.module';
 import { NewsModule } from './news/news.module';
 import { NewsCommentModule } from './news-comment/news-comment.module';
 import { NewsLikeModule } from './news-like/news-like.module';
@@ -14,11 +14,14 @@ import { ProjectModule } from './project/project.module';
 import { ProjectCommentModule } from './project-comment/project-comment.module';
 import { ProjectLikeModule } from './project-like/project-like.module';
 import { ProjectPhotoModule } from './project-photo/project-photo.module';
+import { ProjectPhotoCommentModule } from './project-photo-comment/project-photo-comment.module';
+import { ProjectPhotoLikeModule } from './project-photo-like/project-photo-like.module';
 import { CreatorModule } from './creator/creator.module';
 import { CreatorCommentModule } from './creator-comment/creator-comment.module';
 import { CreatorLikeModule } from './creator-like/creator-like.module';
 import { UserModule } from './user/user.module';
 import { UserGameScoresModule } from './user-game-scores/user-game-scores.module';
+import { GamesModule } from './game/game.module';
 import { AuthModule } from './auth/auth.module';
 
 @Module({
@@ -29,6 +32,11 @@ import { AuthModule } from './auth/auth.module';
         limit: 10, // 10 requests per minute
       },
     ]),
+    MulterModule.register({ dest: './uploads' }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'uploads'),
+      serveRoot: '/uploads',
+    }),
         TypeOrmModule.forRoot({
           type: 'sqlite',
           database: 'database.sqlite',
@@ -36,9 +44,6 @@ import { AuthModule } from './auth/auth.module';
           synchronize: true, 
           logging: false,
         }),
-    GamesModule,
-    GameCommentModule,
-    GameLikeModule,
     NewsModule,
     NewsCommentModule,
     NewsLikeModule,
@@ -46,12 +51,15 @@ import { AuthModule } from './auth/auth.module';
     ProjectCommentModule,
     ProjectLikeModule,
     ProjectPhotoModule,
+    ProjectPhotoCommentModule,
+    ProjectPhotoLikeModule,
     CreatorModule,
     CreatorCommentModule,
     CreatorLikeModule,
     UserModule,
     UserGameScoresModule,
     AuthModule,
+    GamesModule,
     UserModule,
     UserGameScoresModule,
   ],

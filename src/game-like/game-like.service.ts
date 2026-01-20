@@ -7,25 +7,22 @@ import { UpdateGameLikeDto } from './dto/update-game-like.dto';
 
 @Injectable()
 export class GameLikeService {
-  private gameLikes: GameLike[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(GameLike)
+    private gameLikeRepository: Repository<GameLike>,
+  ) {}
 
   async create(createGameLikeDto: CreateGameLikeDto): Promise<GameLike> {
-    const gameLike: GameLike = {
-      id: this.idCounter++,
-      ...createGameLikeDto,
-      game: { id: createGameLikeDto.gameId } as any,
-    } as any;
-    this.gameLikes.push(gameLike);
-    return gameLike;
+    const gameLike = this.gameLikeRepository.create(createGameLikeDto);
+    return this.gameLikeRepository.save(gameLike);
   }
 
   async findAll(): Promise<GameLike[]> {
-    return this.gameLikes;
+    return this.gameLikeRepository.find({ relations: ['user', 'game'] });
   }
 
   async findOne(id: number): Promise<GameLike> {
-    const gameLike = this.gameLikes.find(f => f.id === id);
+    const gameLike = await this.gameLikeRepository.findOne({ where: { id }, relations: ['user', 'game'] });
     if (!gameLike) {
       throw new NotFoundException(`GameLike with ID ${id} not found`);
     }
@@ -33,18 +30,18 @@ export class GameLikeService {
   }
 
   async update(id: number, updateGameLikeDto: UpdateGameLikeDto): Promise<GameLike> {
-    const gameLike = await this.findOne(id);
-    Object.assign(gameLike, updateGameLikeDto);
-    return gameLike;
+    await this.gameLikeRepository.update(id, updateGameLikeDto);
+    return this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {
-    const index = this.gameLikes.findIndex(f => f.id === id);
-    if (index === -1) {
+    const result = await this.gameLikeRepository.delete(id);
+    if (result.affected === 0) {
       throw new NotFoundException(`GameLike with ID ${id} not found`);
     }
-    this.gameLikes.splice(index, 1);
   }
 
-  
+  async findByGameId(gameId: number): Promise<GameLike[]> {
+    return this.gameLikeRepository.find({ where: { gameId }, relations: ['user'] });
+  }
 }

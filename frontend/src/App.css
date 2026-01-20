@@ -2,14 +2,15 @@
 .App {
   text-align: center;
   font-family: Arial, sans-serif;
-  background-color: #f5f5f5;
+  background-color: black;
   min-height: 100vh;
   padding: 20px;
+  color: #00FFAA;
 }
 
 header {
-  background-color: #282c34;
-  color: white;
+  background-color: #0A192F;
+  color: #00FFAA;
   padding: 20px;
   margin-bottom: 20px;
 }
@@ -34,10 +35,11 @@ nav a:hover {
 main {
   max-width: 1200px;
   margin: 0 auto;
-  background-color: white;
+  background-color: black;
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  color: #00FFAA;
 }
 
 section {
@@ -45,30 +47,32 @@ section {
 }
 
 h1, h2 {
-  color: #282c34;
+  color: #00FFAA;
 }
 
 button {
-  background-color: #61dafb;
+  background-color: #00FFAA;
   border: none;
   padding: 10px 20px;
-  color: white;
+  color: black;
   cursor: pointer;
   border-radius: 4px;
   margin: 5px;
 }
 
 button:hover {
-  background-color: #21a3c4;
+  background-color: #00FFCC;
 }
 
 input, textarea {
   padding: 10px;
   margin: 5px;
-  border: 1px solid #ccc;
+  border: 1px solid #00FFAA;
   border-radius: 4px;
   width: 100%;
   max-width: 300px;
+  background-color: black;
+  color: #00FFAA;
 }
 
 form {
@@ -85,14 +89,16 @@ form {
 }
 
 .crud-item {
-  border: 1px solid #ddd;
+  border: 1px solid #00FFAA;
   padding: 15px;
   border-radius: 8px;
-  background-color: #fafafa;
+  background-color: black;
+  color: #00FFAA;
 }
 
 .crud-item h3 {
   margin-top: 0;
+  color: #00FFAA;
 }
 
 .logout-btn:hover {
@@ -107,23 +113,24 @@ form {
 }
 
 .dashboard-card {
-  border: 1px solid #ddd;
+  border: 1px solid #00FFAA;
   padding: 20px;
   border-radius: 8px;
-  background-color: #fff;
+  background-color: black;
   text-align: center;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  color: #00FFAA;
 }
 
 .dashboard-card h3 {
   margin-top: 0;
-  color: #61dafb;
+  color: #00FFAA;
 }
 
 footer {
   margin-top: 40px;
   padding: 20px;
-  background-color: #282c34;
-  color: white;
+  background-color: #0A192F;
+  color: #00FFAA;
   text-align: center;
 }

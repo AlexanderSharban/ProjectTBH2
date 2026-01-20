@@ -1,5 +1,3 @@
-"use client";
-
 import { useEffect, useRef, useState } from "react";
 import api from '../../api';
 
@@ -51,11 +49,13 @@ export default function SurvivalGame() {
   };
 
   useEffect(() => {
-    const totalItems = inventory.wood + inventory.water + inventory.cabin;
-    if (totalItems > 0) {
+    if (health === 0 && !isGameOver) {
+      setIsGameOver(true);
       submitScore();
     }
-  }, [inventory]);
+  }, [health, isGameOver]);
+
+  const generateForestMap = () => {
     const map = Array(MAP_HEIGHT)
       .fill(null)
       .map(() => Array(MAP_WIDTH).fill(0));
@@ -463,24 +463,30 @@ export default function SurvivalGame() {
 
   const craftCabin = () => {
     if (inventory.wood >= 10) {
-      setInventory((prev) => ({
-        ...prev,
-        wood: prev.wood - 10,
-        cabin: prev.cabin + 1,
-      }));
-      if (selectedItem === "wood" && prev.wood - 10 === 0) {
-        setSelectedItem(null);
-      }
+      setInventory((prev) => {
+        const newWood = prev.wood - 10;
+        if (selectedItem === "wood" && newWood === 0) {
+          setSelectedItem(null);
+        }
+        return {
+          ...prev,
+          wood: newWood,
+          cabin: prev.cabin + 1,
+        };
+      });
     }
   };
 
   const heal = () => {
     if (health < maxHealth && inventory.wood > 0) {
       setHealth((prev) => prev + 1);
-      setInventory((prev) => ({ ...prev, wood: prev.wood - 1 }));
-      if (inventory.wood - 1 === 0 && selectedItem === "wood") {
-        setSelectedItem(null);
-      }
+      setInventory((prev) => {
+        const newWood = prev.wood - 1;
+        if (newWood === 0 && selectedItem === "wood") {
+          setSelectedItem(null);
+        }
+        return { ...prev, wood: newWood };
+      });
     }
   };
 
@@ -731,10 +737,7 @@ export default function SurvivalGame() {
     );
   }
 
-      <Head>
-        <title>Сапёр</title>
-        <meta name="description" content="Игра Сапёр на React" />
-      </Head>
+
 
   return (
     <div

@@ -24,6 +24,13 @@ export class NewsCommentController {
     return this.newsCommentService.findAll();
   }
 
+  @Get('news/:newsId')
+  @ApiOperation({ summary: 'Get comments by news ID' })
+  @ApiParam({ name: 'newsId', type: 'number' })
+  findByNewsId(@Param('newsId', ParseIntPipe) newsId: number): Promise<NewsComment[]> {
+    return this.newsCommentService.findByNewsId(newsId);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get news comment by ID' })
   @ApiParam({ name: 'id', type: 'number', description: 'News comment ID' })

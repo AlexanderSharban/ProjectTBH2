@@ -1,5 +1,6 @@
 import { Injectable, UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
+import { CreatorService } from '../creator/creator.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { SignupDto } from './dto/signup.dto';
@@ -8,6 +9,7 @@ import { SignupDto } from './dto/signup.dto';
 export class AuthService {
   constructor(
     private usersService: UserService,
+    private creatorService: CreatorService,
     private jwtService: JwtService,
   ) {}
 
@@ -26,7 +28,18 @@ export class AuthService {
       passwordHash,
     });
 
-    const token = this.jwtService.sign({ id: user.id, email: user.email });
+    // Create creator profile
+    await this.creatorService.create({
+      userId: user.id,
+      name: username,
+      bio: '',
+      avatarUrl: '',
+    });
+
+    const creator = await this.creatorService.findByUserId(user.id);
+    if (!creator) throw new Error('Creator profile not found');
+
+    const token = this.jwtService.sign({ id: user.id, email: user.email, creatorId: creator.id });
     return { token };
   }
 
@@ -37,7 +50,10 @@ export class AuthService {
     const match = await bcrypt.compare(password, (user as any).passwordHash);
     if (!match) throw new UnauthorizedException('Invalid credentials');
 
-    const token = this.jwtService.sign({ id: user.id, email: user.email });
+    const creator = await this.creatorService.findByUserId(user.id);
+    if (!creator) throw new UnauthorizedException('Creator profile not found');
+
+    const token = this.jwtService.sign({ id: user.id, email: user.email, creatorId: creator.id });
     return { token };
   }
 }

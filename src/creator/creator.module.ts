@@ -10,5 +10,6 @@ import { Creator } from './entities/creator.entity';
   ],
   controllers: [CreatorsController],
   providers: [CreatorService],
+  exports: [CreatorService],
 })
 export class CreatorModule {}

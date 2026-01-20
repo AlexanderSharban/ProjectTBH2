@@ -23,6 +23,13 @@ export class NewsLikeController {
   findAll(): Promise<NewsLike[]> {
     return this.newsLikeService.findAll();
   }
+
+  @Get('news/:newsId')
+  @ApiOperation({ summary: 'Get likes by news ID' })
+  @ApiParam({ name: 'newsId', type: 'number' })
+  findByNewsId(@Param('newsId', ParseIntPipe) newsId: number): Promise<NewsLike[]> {
+    return this.newsLikeService.findByNewsId(newsId);
+  }
   
 
   @Get(':id')

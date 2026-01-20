@@ -7,25 +7,25 @@ import { UpdateProjectCommentDto } from './dto/update-project-comment.dto';
 
 @Injectable()
 export class ProjectCommentService {
-  private projectComments: ProjectComment[] = [];
-  private idCounter = 1;
+  constructor(
+    @InjectRepository(ProjectComment)
+    private projectCommentRepository: Repository<ProjectComment>,
+  ) {}
 
   async create(createProjectCommentDto: CreateProjectCommentDto): Promise<ProjectComment> {
-    const projectComment: ProjectComment = {
-      id: this.idCounter++,
-      ...createProjectCommentDto,
-      project: { id: createProjectCommentDto.projectId } as any,
-    } as any;
-    this.projectComments.push(projectComment);
-    return projectComment;
+    const projectComment = this.projectCommentRepository.create(createProjectCommentDto);
+    return this.projectCommentRepository.save(projectComment);
   }
 
   async findAll(): Promise<ProjectComment[]> {
-    return this.projectComments;
+    return this.projectCommentRepository.find({ relations: ['user', 'project'] });
   }
 
   async findOne(id: number): Promise<ProjectComment> {
-    const projectComment = this.projectComments.find(f => f.id === id);
+    const projectComment = await this.projectCommentRepository.findOne({
+      where: { id },
+      relations: ['user', 'project'],
+    });
     if (!projectComment) {
       throw new NotFoundException(`ProjectComment with ID ${id} not found`);
     }
@@ -35,16 +35,19 @@ export class ProjectCommentService {
   async update(id: number, updateProjectCommentDto: UpdateProjectCommentDto): Promise<ProjectComment> {
     const projectComment = await this.findOne(id);
     Object.assign(projectComment, updateProjectCommentDto);
-    return projectComment;
+    return this.projectCommentRepository.save(projectComment);
   }
 
   async remove(id: number): Promise<void> {
-    const index = this.projectComments.findIndex(f => f.id === id);
-    if (index === -1) {
-      throw new NotFoundException(`ProjectComment with ID ${id} not found`);
-    }
-    this.projectComments.splice(index, 1);
+    const projectComment = await this.findOne(id);
+    await this.projectCommentRepository.remove(projectComment);
   }
 
-
+  async findByProjectId(projectId: number): Promise<ProjectComment[]> {
+    return this.projectCommentRepository.find({
+      where: { projectId },
+      relations: ['user', 'project'],
+      order: { createdAt: 'ASC' },
+    });
+  }
 }

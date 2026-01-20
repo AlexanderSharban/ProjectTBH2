@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const Layout = ({ children }) => {
+const Layout = ({ children, isLoggedIn }) => {
   const socialLinks = [
     "https://nodejs.org/en",
     "https://git-scm.com/",
@@ -126,6 +126,18 @@ const Layout = ({ children }) => {
               НОВОСТИ
             </span>
           </Link>
+          {isLoggedIn && (
+            <>
+              <Link to="/register" style={{
+                textDecoration: 'none',
+                color: '#00FFAA'
+              }}>
+                <span className="hover:underline hover:text-[#00FFCC]">
+                  РЕГИСТРАЦИЯ
+                </span>
+              </Link>
+            </>
+          )}
           <Link to="/login" style={{
             textDecoration: 'none',
             color: '#00FFAA'
